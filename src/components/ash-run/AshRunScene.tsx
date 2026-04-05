@@ -10,13 +10,17 @@ import {
   type InputBits,
 } from "@/features/ash-run/core";
 import { createEmptyInput } from "@/features/ash-run/ui/input";
-import { renderGameFrame } from "@/features/ash-run/ui/render-frame";
+import {
+  createRenderScratch,
+  renderGameFrame,
+} from "@/features/ash-run/ui/render-frame";
 import { useCallback, useEffect, useRef } from "react";
 
 export function AshRunScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameState>(createInitialGameState());
   const inputRef = useRef<InputBits>(createEmptyInput());
+  const renderScratchRef = useRef(createRenderScratch());
 
   const syncInputEdgeFlags = useCallback(() => {
     const held = inputRef.current;
@@ -92,7 +96,15 @@ export function AshRunScene() {
 
       const c = canvasRef.current;
       const ctx = c?.getContext("2d");
-      if (ctx) renderGameFrame(ctx, stateRef.current);
+      if (ctx) {
+        renderGameFrame(
+          ctx,
+          stateRef.current,
+          renderScratchRef.current,
+          now,
+          rawDt,
+        );
+      }
 
       raf = requestAnimationFrame(frame);
     };

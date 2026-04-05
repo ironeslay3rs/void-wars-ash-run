@@ -32,5 +32,6 @@ export function createInitialGameState(): GameState {
     bossGateTriggered: false,
     minibossSpawned: false,
     hazardAccMs: 0,
+    hitStopRemainingMs: 0,
   };
 }

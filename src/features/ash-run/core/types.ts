@@ -20,6 +20,8 @@ export type GameState = {
   bossGateTriggered: boolean;
   minibossSpawned: boolean;
   hazardAccMs: number;
+  /** Ms of sim freeze remaining; decremented by fixed dt, deterministic. */
+  hitStopRemainingMs: number;
 };
 
 export type InputBits = {

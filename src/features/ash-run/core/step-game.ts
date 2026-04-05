@@ -19,18 +19,25 @@ import {
   BIO_BURST_VY,
   COYOTE_MS,
   DASH_COOLDOWN_MS,
+  DASH_END_VX_MULT,
   DASH_MS,
   DASH_SPEED,
+  ENEMY_CONTACT_KNOCKBACK_VX,
+  ENEMY_CONTACT_KNOCKBACK_VY,
   FRICTION_AIR,
   FRICTION_GROUND,
   GRAVITY,
   HAZARD_TICK_MS,
+  HIT_STOP_MS,
   INVULN_AFTER_HIT_MS,
   JUMP_BUFFER_MS,
   JUMP_VELOCITY,
+  LANDING_VX_DAMP,
+  LANDING_VY_THRESHOLD,
   MAX_FALL_SPEED,
   MECHA_DASH_MS,
-  MOVE_ACCEL,
+  MOVE_ACCEL_AIR,
+  MOVE_ACCEL_GROUND,
   MOVE_MAX,
   PERCEPTION_MS,
   PERCEPTION_SCALE,
@@ -44,14 +51,29 @@ function randomChannel(): UnstableChannel {
   return Math.floor(Math.random() * 3) as UnstableChannel;
 }
 
+/**
+ * One fixed timestep. Deterministic: same state + input + dt → same next state.
+ * Hit-stop burns whole steps without integrating physics so M1 / 60Hz stay aligned.
+ */
 export function stepGame(state: GameState, input: InputBits, dtMs: number): GameState {
   if (state.phase !== "playing") return state;
 
   const s = { ...state };
+
+  /* Hit-stop: freeze world & input consumption for a few ms after a landed hit.
+     No partial physics in the same step — keeps the fixed-step loop simple. */
+  if (s.hitStopRemainingMs > 0) {
+    const next = Math.max(0, s.hitStopRemainingMs - dtMs);
+    return { ...s, hitStopRemainingMs: next };
+  }
+
   const ash = { ...s.ash };
   const solids = solidsOf(s.level);
   const floor = solids.find((x) => x.x === 0 && x.w >= s.level.width - 100);
   const floorY = floor ? floor.y : 480;
+
+  /* Snapshot before timers: used to detect dash ending this step (burst trim). */
+  const dashMsAtStepStart = state.ash.dashRemainingMs;
 
   const timeMul = ash.perceptionRemainingMs > 0 ? PERCEPTION_SCALE : 1;
   const dt = dtMs * timeMul;
@@ -102,7 +124,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   ) {
     ash.dashRemainingMs = DASH_MS;
     ash.dashCooldownMs = DASH_COOLDOWN_MS;
-    ash.vy *= 0.35;
+    /* Strong vertical dump: burst reads committed, not a floaty drift. */
+    ash.vy *= 0.2;
   }
 
   const dashing = ash.dashRemainingMs > 0;
@@ -115,7 +138,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     if (input.right) target += 1;
     if (target !== 0) ash.facing = (target > 0 ? 1 : -1) as 1 | -1;
 
-    const accel = MOVE_ACCEL * dt * 0.001;
+    const accelRate = ash.grounded ? MOVE_ACCEL_GROUND : MOVE_ACCEL_AIR;
+    const accel = accelRate * dt * 0.001;
     if (target !== 0) {
       ash.vx += target * accel;
       ash.vx = clamp(ash.vx, -MOVE_MAX, MOVE_MAX);
@@ -135,6 +159,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     }
   }
 
+  const vyBeforeMove = ash.vy;
+
   const dx = (ash.vx * dt) / 1000;
   ash.x = resolveX(ash, solids, dx);
   ash.x = clamp(ash.x, 0, s.level.width - ash.width);
@@ -144,6 +170,19 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   ash.y = ry.y;
   ash.grounded = ry.grounded;
   if (ash.grounded && ash.vy > 0) ash.vy = 0;
+
+  /* Landing from a real fall: trim horizontal carry so stepped geometry and
+     platform lips read as stable landings, not sideways skates. */
+  if (ry.grounded && vyBeforeMove > LANDING_VY_THRESHOLD) {
+    ash.vx *= LANDING_VX_DAMP;
+  }
+
+  /* Dash / mecha burst ended this fixed step: cut carried vx so the move
+     doesn’t decay slowly into a “slide” on the next frames. */
+  if (dashMsAtStepStart > 0 && ash.dashRemainingMs <= 0) {
+    ash.vx *= DASH_END_VX_MULT;
+    if (Math.abs(ash.vx) < 12) ash.vx = 0;
+  }
 
   if (
     input.attackPressed &&
@@ -244,6 +283,7 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
 
   let enemies = s.enemies.map((en) => ({ ...en }));
   const er: Rect = { x: 0, y: 0, w: 0, h: 0 };
+  let hitStopMs = 0;
 
   for (let i = 0; i < enemies.length; i++) {
     let en = enemies[i]!;
@@ -267,13 +307,19 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
         hp: en.hp - ash.hitbox.damage,
         hurtCooldownMs: 380,
       };
+      /* Subtle freeze: one duration cap per step (no stacking multi-hits). */
+      hitStopMs = Math.max(hitStopMs, HIT_STOP_MS);
     }
 
     if (rectsOverlap(ar, er) && ash.invulnMs <= 0) {
       ash.hp -= en.damage;
       ash.invulnMs = INVULN_AFTER_HIT_MS;
-      ash.vx = -ash.facing * 220;
-      ash.vy = -180;
+      /* Knockback away from enemy mass (fair read vs fixed -facing shove). */
+      const ecx = en.x + en.w / 2;
+      const acx = ash.x + ash.width / 2;
+      const away = acx >= ecx ? 1 : -1;
+      ash.vx = away * ENEMY_CONTACT_KNOCKBACK_VX;
+      ash.vy = ENEMY_CONTACT_KNOCKBACK_VY;
     }
 
     const pdt = (en.vx * dt) / 1000;
@@ -313,5 +359,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     Math.max(0, s.level.width - VIEW_WIDTH),
   );
 
-  return s;
+  return {
+    ...s,
+    hitStopRemainingMs: hitStopMs,
+  };
 }
