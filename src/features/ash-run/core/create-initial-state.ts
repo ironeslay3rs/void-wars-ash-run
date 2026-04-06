@@ -26,8 +26,8 @@ export function createInitialGameState(): GameState {
     cameraX: 0,
     beat: {
       id: "intro",
-      text: "Ash — stolen name, borrowed bones. The lab hums; the fusion in his ribs doesn't know whose child it is.",
-      ttlMs: 5200,
+      text: "Ash — borrowed bones, fusion that won't name her. Lab hums wrong. Move.",
+      ttlMs: 3800,
     },
     bossGateTriggered: false,
     minibossSpawned: false,

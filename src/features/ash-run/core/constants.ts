@@ -60,6 +60,10 @@ export const ATTACK_ACTIVE_MS = 72;
 /* -------------------------------------------------------------------------- */
 /* Unstable fusion (unchanged roles; timings follow dash/attack above)         */
 /* -------------------------------------------------------------------------- */
+/** Ash-only: fusion commit needs prior motion (see step-game fusionMotionReady). */
+export const UNSTABLE_MOTION_VX_MIN = 52;
+/** Cooldown ticks down faster while Ash is moving — rewards staying in flow. */
+export const UNSTABLE_COOLDOWN_RECHARGE_MUL = 1.16;
 export const UNSTABLE_COOLDOWN_MS = 3200;
 export const UNSTABLE_FLASH_MS = 220;
 export const BIO_BURST_VX = 420;
@@ -67,11 +71,15 @@ export const BIO_BURST_VY = -180;
 export const MECHA_DASH_MS = 88;
 export const PERCEPTION_MS = 480;
 export const PERCEPTION_SCALE = 0.42;
+/** Fusion as movement layer: Bio / Mecha windows after [K] (Pure uses perception time). */
+export const FUSION_BIO_MOVE_MS = 540;
+export const FUSION_MECHA_MOVE_MS = 460;
 
 export const ASH_WIDTH = 22;
 export const ASH_HEIGHT = 36;
 export const INVULN_AFTER_HIT_MS = 1200;
-export const HAZARD_TICK_MS = 200;
+/** Slice-tuned: slightly slower hazard ticks than 200ms so acid reads fair on 3 HP. */
+export const HAZARD_TICK_MS = 215;
 
 /* -------------------------------------------------------------------------- */
 /* Enemy body contact — knockback only (no new systems)                        */

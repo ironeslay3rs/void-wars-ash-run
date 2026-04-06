@@ -1,5 +1,5 @@
 import { createLabSentinelMiniboss } from "../entities/enemy";
-import type { UnstableChannel } from "../entities/types";
+import type { Ash, UnstableChannel } from "../entities/types";
 import { findExit, isBossGate, isCheckpoint, isHazard, solidsOf } from "../level/queries";
 import type { Rect } from "../level/types";
 import {
@@ -26,6 +26,8 @@ import {
   ENEMY_CONTACT_KNOCKBACK_VY,
   FRICTION_AIR,
   FRICTION_GROUND,
+  FUSION_BIO_MOVE_MS,
+  FUSION_MECHA_MOVE_MS,
   GRAVITY,
   HAZARD_TICK_MS,
   HIT_STOP_MS,
@@ -42,13 +44,42 @@ import {
   PERCEPTION_MS,
   PERCEPTION_SCALE,
   UNSTABLE_COOLDOWN_MS,
+  UNSTABLE_COOLDOWN_RECHARGE_MUL,
   UNSTABLE_FLASH_MS,
+  UNSTABLE_MOTION_VX_MIN,
   VIEW_WIDTH,
 } from "./constants";
 import type { GameState, InputBits } from "./types";
 
-function randomChannel(): UnstableChannel {
-  return Math.floor(Math.random() * 3) as UnstableChannel;
+function modChannel(n: number): UnstableChannel {
+  return ((((n % 3) + 3) % 3) as UnstableChannel);
+}
+
+/**
+ * Fusion queue: Bio → Mecha → Pure → … HUD `unstableNextChannel` is exactly what
+ * [K] fires — no mid-fight input branching (readability over cleverness).
+ */
+
+/**
+ * Unstable fusion identity: the grafted spine only “catches” when Ash is already
+ * moving — air, dash, or meaningful horizontal speed. Standing still on the lab
+ * floor does nothing (no cooldown spent), so escape stays kinetic, not idle.
+ */
+function fusionMotionReady(ash: Ash): boolean {
+  return (
+    !ash.grounded ||
+    Math.abs(ash.vx) >= UNSTABLE_MOTION_VX_MIN ||
+    ash.dashRemainingMs > 0
+  );
+}
+
+/** Which fusion movement style applies — Pure wins whenever route-sense is active. */
+function fusionMoveStyle(ash: Ash): "bio" | "mecha" | "pure" | null {
+  if (ash.perceptionRemainingMs > 0) return "pure";
+  if (ash.fusionMoveMs <= 0 || ash.fusionMoveChannel === null) return null;
+  if (ash.fusionMoveChannel === 0) return "bio";
+  if (ash.fusionMoveChannel === 1) return "mecha";
+  return null;
 }
 
 /**
@@ -81,6 +112,10 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   if (ash.perceptionRemainingMs > 0) {
     ash.perceptionRemainingMs = Math.max(0, ash.perceptionRemainingMs - dtMs);
   }
+  if (ash.fusionMoveMs > 0) {
+    ash.fusionMoveMs = Math.max(0, ash.fusionMoveMs - dtMs);
+    if (ash.fusionMoveMs <= 0) ash.fusionMoveChannel = null;
+  }
 
   if (s.beat) {
     const ttl = s.beat.ttlMs - dtMs;
@@ -95,7 +130,15 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     ash.dashCooldownMs = Math.max(0, ash.dashCooldownMs - dtMs);
   }
   if (ash.unstableCooldownMs > 0) {
-    ash.unstableCooldownMs = Math.max(0, ash.unstableCooldownMs - dtMs);
+    let cdDecay = dtMs;
+    if (
+      Math.abs(ash.vx) >= UNSTABLE_MOTION_VX_MIN ||
+      !ash.grounded ||
+      ash.dashRemainingMs > 0
+    ) {
+      cdDecay *= UNSTABLE_COOLDOWN_RECHARGE_MUL;
+    }
+    ash.unstableCooldownMs = Math.max(0, ash.unstableCooldownMs - cdDecay);
   }
   if (ash.unstableFlashMs > 0) {
     ash.unstableFlashMs = Math.max(0, ash.unstableFlashMs - dtMs);
@@ -111,10 +154,17 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     }
   }
 
-  if (ash.grounded) ash.coyoteMs = COYOTE_MS;
-  else ash.coyoteMs = Math.max(0, ash.coyoteMs - dt);
+  {
+    const cap = fusionMoveStyle(ash) === "pure" ? COYOTE_MS * 1.18 : COYOTE_MS;
+    if (ash.grounded) ash.coyoteMs = cap;
+    else ash.coyoteMs = Math.max(0, ash.coyoteMs - dt);
+  }
 
-  if (input.jumpPressed) ash.jumpBufferMs = JUMP_BUFFER_MS;
+  const fStyle = fusionMoveStyle(ash);
+  const jbMax =
+    fStyle === "pure" ? JUMP_BUFFER_MS * 1.12 : JUMP_BUFFER_MS;
+
+  if (input.jumpPressed) ash.jumpBufferMs = jbMax;
   else ash.jumpBufferMs = Math.max(0, ash.jumpBufferMs - dt);
 
   if (
@@ -130,26 +180,56 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
 
   const dashing = ash.dashRemainingMs > 0;
   if (dashing) {
-    ash.vx = ash.facing * DASH_SPEED;
+    let dSp = DASH_SPEED;
+    if (fStyle === "mecha") dSp *= 1.045;
+    ash.vx = ash.facing * dSp;
     ash.vy = 0;
   } else {
+    let moveMax = MOVE_MAX;
+    let ag = MOVE_ACCEL_GROUND;
+    let aa = MOVE_ACCEL_AIR;
+    let frG = FRICTION_GROUND;
+    let frA = FRICTION_AIR;
+    let grav = GRAVITY;
+    let vCap = MAX_FALL_SPEED;
+    if (fStyle === "bio") {
+      moveMax *= 1.22;
+      ag *= 1.16;
+      aa *= 1.12;
+      frG *= 0.9;
+      frA *= 0.93;
+    } else if (fStyle === "mecha") {
+      moveMax *= 0.9;
+      ag *= 1.36;
+      aa *= 1.3;
+      frG *= 1.07;
+      frA *= 1.05;
+    } else if (fStyle === "pure") {
+      ag *= 0.94;
+      aa *= 0.88;
+      frA *= 1.045;
+      frG *= 1.03;
+      grav *= 0.86;
+      vCap *= 0.88;
+    }
+
     let target = 0;
     if (input.left) target -= 1;
     if (input.right) target += 1;
     if (target !== 0) ash.facing = (target > 0 ? 1 : -1) as 1 | -1;
 
-    const accelRate = ash.grounded ? MOVE_ACCEL_GROUND : MOVE_ACCEL_AIR;
+    const accelRate = ash.grounded ? ag : aa;
     const accel = accelRate * dt * 0.001;
     if (target !== 0) {
       ash.vx += target * accel;
-      ash.vx = clamp(ash.vx, -MOVE_MAX, MOVE_MAX);
+      ash.vx = clamp(ash.vx, -moveMax, moveMax);
     } else {
-      const f = ash.grounded ? FRICTION_GROUND : FRICTION_AIR;
+      const f = ash.grounded ? frG : frA;
       ash.vx *= f;
       if (Math.abs(ash.vx) < 8) ash.vx = 0;
     }
 
-    ash.vy = Math.min(MAX_FALL_SPEED, ash.vy + (GRAVITY * dt) / 1000);
+    ash.vy = Math.min(vCap, ash.vy + (grav * dt) / 1000);
 
     if (ash.jumpBufferMs > 0 && ash.coyoteMs > 0) {
       ash.vy = JUMP_VELOCITY;
@@ -174,13 +254,17 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   /* Landing from a real fall: trim horizontal carry so stepped geometry and
      platform lips read as stable landings, not sideways skates. */
   if (ry.grounded && vyBeforeMove > LANDING_VY_THRESHOLD) {
-    ash.vx *= LANDING_VX_DAMP;
+    let ld = LANDING_VX_DAMP;
+    if (fusionMoveStyle(ash) === "bio") ld *= 0.88;
+    ash.vx *= ld;
   }
 
   /* Dash / mecha burst ended this fixed step: cut carried vx so the move
      doesn’t decay slowly into a “slide” on the next frames. */
   if (dashMsAtStepStart > 0 && ash.dashRemainingMs <= 0) {
-    ash.vx *= DASH_END_VX_MULT;
+    let endMult = DASH_END_VX_MULT;
+    if (fusionMoveStyle(ash) === "mecha") endMult *= 0.86;
+    ash.vx *= endMult;
     if (Math.abs(ash.vx) < 12) ash.vx = 0;
   }
 
@@ -204,12 +288,19 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     };
   }
 
-  if (input.unstablePressed && ash.unstableCooldownMs <= 0) {
+  if (
+    input.unstablePressed &&
+    ash.unstableCooldownMs <= 0 &&
+    fusionMotionReady(ash)
+  ) {
     ash.unstableCooldownMs = UNSTABLE_COOLDOWN_MS;
     ash.unstableFlashMs = UNSTABLE_FLASH_MS;
-    const ch = randomChannel();
+    const ch = ash.unstableNextChannel;
     ash.unstableChannel = ch;
+    ash.unstableNextChannel = modChannel(ch + 1);
     if (ch === 0) {
+      ash.fusionMoveChannel = 0;
+      ash.fusionMoveMs = FUSION_BIO_MOVE_MS;
       ash.vx += ash.facing * BIO_BURST_VX;
       ash.vy += BIO_BURST_VY;
       const hx = ash.facing === 1 ? ash.x + ash.width - 4 : ash.x - 44;
@@ -224,10 +315,15 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
         hurtsEnemies: true,
       };
     } else if (ch === 1) {
+      ash.fusionMoveChannel = 1;
+      ash.fusionMoveMs = FUSION_MECHA_MOVE_MS;
       ash.dashRemainingMs = MECHA_DASH_MS;
       ash.vx = ash.facing * (DASH_SPEED * 1.05);
       ash.vy *= 0.2;
     } else {
+      ash.fusionMoveChannel = null;
+      ash.fusionMoveMs = 0;
+      /* Pure: route-sense + smoother movement while perception lasts. */
       ash.perceptionRemainingMs = PERCEPTION_MS;
     }
   }
@@ -242,7 +338,7 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     if (isBossGate(e) && rectsOverlap(ar, e)) {
       if (!s.bossGateTriggered) {
         s.bossGateTriggered = true;
-        s.beat = { id: "gate", text: e.enterLine, ttlMs: 6000 };
+        s.beat = { id: "gate", text: e.enterLine, ttlMs: 4200 };
       }
     }
   }
@@ -259,8 +355,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
       s.phase = "won";
       s.beat = {
         id: "escaped",
-        text: "The hatch gives. Cold street air—wrong city, right breath. Run isn't over; it's just real now.",
-        ttlMs: 8000,
+        text: "Hatch gives—cold street, wrong city, right breath. Gone.",
+        ttlMs: 4800,
       };
     }
   }
@@ -280,6 +376,10 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   s.hazardAccMs = hazardAcc;
 
   if (tookHazard) ash.invulnMs = Math.max(ash.invulnMs, 400);
+
+  const sentinelAliveBefore = s.enemies.some(
+    (en) => en.isMiniboss && en.hp > 0,
+  );
 
   let enemies = s.enemies.map((en) => ({ ...en }));
   const er: Rect = { x: 0, y: 0, w: 0, h: 0 };
@@ -334,16 +434,33 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
 
   enemies = enemies.filter((en) => en.hp > 0);
 
+  const sentinelAliveAfter = enemies.some(
+    (en) => en.isMiniboss && en.hp > 0,
+  );
+  if (
+    sentinelAliveBefore &&
+    !sentinelAliveAfter &&
+    s.phase === "playing"
+  ) {
+    s.beat = {
+      id: "sentinel_down",
+      text: "Sentinel folds—hatch stutters green. Don't admire it. Move.",
+      ttlMs: 2600,
+    };
+  }
+
   if (ash.hp <= 0) {
     ash.hp = ash.maxHp;
     ash.x = ash.respawnX;
     ash.y = ash.respawnY;
     ash.vx = 0;
     ash.vy = 0;
+    ash.fusionMoveMs = 0;
+    ash.fusionMoveChannel = null;
     ash.invulnMs = INVULN_AFTER_HIT_MS;
     s.beat = {
       id: "down",
-      text: "Ash hits tile—fusion stutters, body remembers the lab floor. Checkpoint breath. Go again.",
+      text: "Ash hits tile—fusion stutters. Body remembers the lab. Breathe. Again.",
       ttlMs: 3800,
     };
   }

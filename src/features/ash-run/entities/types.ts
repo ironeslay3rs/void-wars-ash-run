@@ -35,7 +35,13 @@ export type Ash = {
   respawnY: number;
   unstableCooldownMs: number;
   unstableFlashMs: number;
+  /** Last channel used this activation (flash / VFX). */
   unstableChannel: UnstableChannel | null;
+  /** Next fusion in the Bio → Mecha → Pure loop — same value shown on HUD. */
+  unstableNextChannel: UnstableChannel;
+  /** Bio/Mecha: temporary movement style after unstable (Pure uses perception only). */
+  fusionMoveMs: number;
+  fusionMoveChannel: UnstableChannel | null;
   perceptionRemainingMs: number;
   width: number;
   height: number;

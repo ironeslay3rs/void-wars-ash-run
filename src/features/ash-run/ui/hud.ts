@@ -1,5 +1,21 @@
-import { VIEW_HEIGHT, VIEW_WIDTH } from "../core/constants";
+import {
+  UNSTABLE_MOTION_VX_MIN,
+  VIEW_HEIGHT,
+  VIEW_WIDTH,
+} from "../core/constants";
 import type { GameState } from "../core/types";
+
+function unstableCanFire(ash: GameState["ash"]): boolean {
+  return (
+    !ash.grounded ||
+    Math.abs(ash.vx) >= UNSTABLE_MOTION_VX_MIN ||
+    ash.dashRemainingMs > 0
+  );
+}
+
+function channelLabel(ch: 0 | 1 | 2): string {
+  return ch === 0 ? "BIO" : ch === 1 ? "MECHA" : "PURE";
+}
 
 export function drawHud(ctx: CanvasRenderingContext2D, state: GameState): void {
   const { ash, beat, phase } = state;
@@ -17,15 +33,19 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState): void {
 
   ctx.fillStyle = "#889";
   ctx.font = "12px system-ui";
-  ctx.fillText(
-    `Unstable: ${ash.unstableCooldownMs > 0 ? `${(ash.unstableCooldownMs / 1000).toFixed(1)}s` : "READY [K]"}`,
-    16,
-    50,
-  );
+  const unstableHud =
+    ash.unstableCooldownMs > 0
+      ? `${(ash.unstableCooldownMs / 1000).toFixed(1)}s`
+      : unstableCanFire(ash)
+        ? "READY"
+        : "move";
+  const nextCh = channelLabel(ash.unstableNextChannel);
+  ctx.fillText(`Unstable [K]: ${unstableHud} · next ${nextCh}`, 16, 50);
 
   if (ash.perceptionRemainingMs > 0) {
     ctx.fillStyle = "#aee";
-    ctx.fillText("PURE — route sense (slow)", 16, 70);
+    ctx.font = "12px system-ui";
+    ctx.fillText("PURE — route sense (slow)", 16, 66);
   }
 
   const ch =
@@ -39,7 +59,7 @@ export function drawHud(ctx: CanvasRenderingContext2D, state: GameState): void {
   if (ch && ash.unstableFlashMs > 0) {
     ctx.fillStyle = "#fff";
     ctx.font = "bold 13px system-ui";
-    ctx.fillText(`Channel: ${ch}`, 16, 90);
+    ctx.fillText(`Channel: ${ch}`, 16, 86);
   }
 
   if (beat) {
