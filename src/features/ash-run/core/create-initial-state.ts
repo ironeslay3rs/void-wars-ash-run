@@ -1,8 +1,11 @@
 import { createAsh } from "../entities/ash";
 import { createBlackcityLabLevel } from "../level/blackcity-lab";
 import { isPatrol, solidsOf } from "../level/queries";
+import { createTimeShadowState } from "../perception/timeShadowSystem";
 import { ASH_HEIGHT } from "./constants";
 import type { GameState } from "./types";
+
+/** Default run: Ash spawns with perception timers at 0; step-game drives [E] read. */
 
 export function createInitialGameState(): GameState {
   const level = createBlackcityLabLevel();
@@ -26,12 +29,13 @@ export function createInitialGameState(): GameState {
     cameraX: 0,
     beat: {
       id: "intro",
-      text: "Ash — borrowed bones, fusion that won't name her. Lab hums wrong. Move.",
-      ttlMs: 3800,
+      text: "Wrong city, wrong chapter — but the page still turns.\nE reads the ink (traces, hazards). Then run it like a legend.",
+      ttlMs: 3200,
     },
     bossGateTriggered: false,
     minibossSpawned: false,
     hazardAccMs: 0,
     hitStopRemainingMs: 0,
+    timeShadow: createTimeShadowState(),
   };
 }

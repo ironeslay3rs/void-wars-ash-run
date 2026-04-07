@@ -31,6 +31,7 @@ import {
   GRAVITY,
   HAZARD_TICK_MS,
   HIT_STOP_MS,
+  CAMERA_LOOKAHEAD_PX,
   INVULN_AFTER_HIT_MS,
   JUMP_BUFFER_MS,
   JUMP_VELOCITY,
@@ -43,12 +44,15 @@ import {
   MOVE_MAX,
   PERCEPTION_MS,
   PERCEPTION_SCALE,
+  PERCEPTION_READ_COOLDOWN_MS,
+  PERCEPTION_READ_DURATION_MS,
   UNSTABLE_COOLDOWN_MS,
   UNSTABLE_COOLDOWN_RECHARGE_MUL,
   UNSTABLE_FLASH_MS,
   UNSTABLE_MOTION_VX_MIN,
   VIEW_WIDTH,
 } from "./constants";
+import { updateTimeShadows } from "../perception/timeShadowSystem";
 import type { GameState, InputBits } from "./types";
 
 function modChannel(n: number): UnstableChannel {
@@ -73,9 +77,9 @@ function fusionMotionReady(ash: Ash): boolean {
   );
 }
 
-/** Which fusion movement style applies — Pure wins whenever route-sense is active. */
+/** Which fusion movement style applies — Pure wins whenever fusion route-sense is active. */
 function fusionMoveStyle(ash: Ash): "bio" | "mecha" | "pure" | null {
-  if (ash.perceptionRemainingMs > 0) return "pure";
+  if (ash.fusionPureSenseMs > 0) return "pure";
   if (ash.fusionMoveMs <= 0 || ash.fusionMoveChannel === null) return null;
   if (ash.fusionMoveChannel === 0) return "bio";
   if (ash.fusionMoveChannel === 1) return "mecha";
@@ -87,6 +91,15 @@ function fusionMoveStyle(ash: Ash): "bio" | "mecha" | "pure" | null {
  * Hit-stop burns whole steps without integrating physics so M1 / 60Hz stay aligned.
  */
 export function stepGame(state: GameState, input: InputBits, dtMs: number): GameState {
+  if (state.phase === "won") {
+    const s = { ...state };
+    if (s.beat) {
+      const ttl = s.beat.ttlMs - dtMs;
+      s.beat = ttl <= 0 ? null : { ...s.beat, ttlMs: ttl };
+    }
+    return s;
+  }
+
   if (state.phase !== "playing") return state;
 
   const s = { ...state };
@@ -106,11 +119,23 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   /* Snapshot before timers: used to detect dash ending this step (burst trim). */
   const dashMsAtStepStart = state.ash.dashRemainingMs;
 
-  const timeMul = ash.perceptionRemainingMs > 0 ? PERCEPTION_SCALE : 1;
+  const timeMul = ash.fusionPureSenseMs > 0 ? PERCEPTION_SCALE : 1;
   const dt = dtMs * timeMul;
 
+  if (ash.fusionPureSenseMs > 0) {
+    ash.fusionPureSenseMs = Math.max(0, ash.fusionPureSenseMs - dtMs);
+  }
+  /* [E] Read space: real-time timers only — never feeds PERCEPTION_SCALE. */
   if (ash.perceptionRemainingMs > 0) {
     ash.perceptionRemainingMs = Math.max(0, ash.perceptionRemainingMs - dtMs);
+    if (ash.perceptionRemainingMs <= 0) {
+      ash.perceptionCooldownRemainingMs = PERCEPTION_READ_COOLDOWN_MS;
+    }
+  } else if (ash.perceptionCooldownRemainingMs > 0) {
+    ash.perceptionCooldownRemainingMs = Math.max(
+      0,
+      ash.perceptionCooldownRemainingMs - dtMs,
+    );
   }
   if (ash.fusionMoveMs > 0) {
     ash.fusionMoveMs = Math.max(0, ash.fusionMoveMs - dtMs);
@@ -166,6 +191,14 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
 
   if (input.jumpPressed) ash.jumpBufferMs = jbMax;
   else ash.jumpBufferMs = Math.max(0, ash.jumpBufferMs - dt);
+
+  if (
+    input.perceptionPressed &&
+    ash.perceptionRemainingMs <= 0 &&
+    ash.perceptionCooldownRemainingMs <= 0
+  ) {
+    ash.perceptionRemainingMs = PERCEPTION_READ_DURATION_MS;
+  }
 
   if (
     input.dashPressed &&
@@ -323,8 +356,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     } else {
       ash.fusionMoveChannel = null;
       ash.fusionMoveMs = 0;
-      /* Pure: route-sense + smoother movement while perception lasts. */
-      ash.perceptionRemainingMs = PERCEPTION_MS;
+      /* Pure: route-sense + smoother movement while fusion sense lasts. */
+      ash.fusionPureSenseMs = PERCEPTION_MS;
     }
   }
 
@@ -355,7 +388,7 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
       s.phase = "won";
       s.beat = {
         id: "escaped",
-        text: "Hatch gives—cold street, wrong city, right breath. Gone.",
+        text: "Hatch gives—cold street, wrong city.\nRight breath. Gone.",
         ttlMs: 4800,
       };
     }
@@ -444,7 +477,7 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   ) {
     s.beat = {
       id: "sentinel_down",
-      text: "Sentinel folds—hatch stutters green. Don't admire it. Move.",
+      text: "Sentinel folds—hatch stutters green.\nDon't admire it. Move.",
       ttlMs: 2600,
     };
   }
@@ -455,25 +488,50 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     ash.y = ash.respawnY;
     ash.vx = 0;
     ash.vy = 0;
+    ash.dashCooldownMs = 0;
+    ash.dashRemainingMs = 0;
+    ash.attackCooldownMs = 0;
+    ash.hitbox = { ...ash.hitbox, active: false, ttl: 0 };
+    ash.unstableCooldownMs = 0;
+    ash.unstableFlashMs = 0;
+    ash.unstableChannel = null;
     ash.fusionMoveMs = 0;
     ash.fusionMoveChannel = null;
+    ash.fusionPureSenseMs = 0;
+    ash.perceptionRemainingMs = 0;
+    ash.perceptionCooldownRemainingMs = 0;
+    ash.perceptionActive = false;
     ash.invulnMs = INVULN_AFTER_HIT_MS;
     s.beat = {
       id: "down",
-      text: "Ash hits tile—fusion stutters. Body remembers the lab. Breathe. Again.",
-      ttlMs: 3800,
+      text: "Ash hits tile—fusion stutters.\nBreathe. Again.",
+      ttlMs: 3600,
     };
   }
 
   ash.hp = clamp(ash.hp, 0, ash.maxHp);
 
+  ash.perceptionActive = ash.perceptionRemainingMs > 0;
+
   s.ash = ash;
   s.enemies = enemies;
 
+  const focusX = ash.x + ash.width / 2 + ash.facing * CAMERA_LOOKAHEAD_PX;
   s.cameraX = clamp(
-    ash.x + ash.width / 2 - VIEW_WIDTH / 2,
+    focusX - VIEW_WIDTH / 2,
     0,
     Math.max(0, s.level.width - VIEW_WIDTH),
+  );
+
+  updateTimeShadows(
+    s.timeShadow,
+    {
+      level: s.level,
+      ash,
+      enemies,
+      phase: s.phase,
+    },
+    dtMs,
   );
 
   return {

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  createEmptyInput,
   createInitialGameState,
   FIXED_DT_MS,
   stepGame,
@@ -9,7 +10,6 @@ import {
   type GameState,
   type InputBits,
 } from "@/features/ash-run/core";
-import { createEmptyInput } from "@/features/ash-run/ui/input";
 import {
   createRenderScratch,
   renderGameFrame,
@@ -22,6 +22,12 @@ export function AshRunScene() {
   const inputRef = useRef<InputBits>(createEmptyInput());
   const renderScratchRef = useRef(createRenderScratch());
 
+  const resetRun = useCallback(() => {
+    stateRef.current = createInitialGameState();
+    inputRef.current = createEmptyInput();
+    renderScratchRef.current = createRenderScratch();
+  }, []);
+
   const syncInputEdgeFlags = useCallback(() => {
     const held = inputRef.current;
     inputRef.current = {
@@ -30,8 +36,21 @@ export function AshRunScene() {
       dashPressed: false,
       attackPressed: false,
       unstablePressed: false,
+      perceptionPressed: false,
     };
   }, []);
+
+  useEffect(() => {
+    const restart = (e: KeyboardEvent) => {
+      if (e.code !== "KeyR" || e.repeat) return;
+      const t = e.target;
+      if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) return;
+      e.preventDefault();
+      resetRun();
+    };
+    window.addEventListener("keydown", restart);
+    return () => window.removeEventListener("keydown", restart);
+  }, [resetRun]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -55,6 +74,10 @@ export function AshRunScene() {
         if (!i.unstable) i.unstablePressed = true;
         i.unstable = true;
       }
+      if (k === "KeyE") {
+        if (!i.perception) i.perceptionPressed = true;
+        i.perception = true;
+      }
     };
     const up = (e: KeyboardEvent) => {
       const k = e.code;
@@ -65,6 +88,7 @@ export function AshRunScene() {
       if (k === "ShiftLeft" || k === "ShiftRight") i.dash = false;
       if (k === "KeyZ" || k === "KeyJ") i.attack = false;
       if (k === "KeyK") i.unstable = false;
+      if (k === "KeyE") i.perception = false;
     };
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
@@ -72,6 +96,10 @@ export function AshRunScene() {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
     };
+  }, []);
+
+  useEffect(() => {
+    canvasRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -114,22 +142,34 @@ export function AshRunScene() {
   }, [syncInputEdgeFlags]);
 
   return (
-    <div className="flex min-h-full flex-col items-center justify-center gap-4 bg-zinc-950 p-4 text-zinc-200">
+    <div className="flex min-h-full flex-col items-center justify-center gap-4 bg-[#252018] p-4 text-amber-100/90">
       <header className="max-w-4xl text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-white">
+        <p className="font-serif text-xs font-medium uppercase tracking-[0.2em] text-amber-600/90">
+          Chapter I · The borrowed page
+        </p>
+        <h1 className="mt-1 font-serif text-2xl font-semibold tracking-tight text-[#f5edd8]">
           Void Wars: Ash Run
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          Blackcity Lab Escape — vertical slice. Move: A/D or arrows · Jump:
-          Space · Dash: Shift · Strike: Z/J · Unstable fusion: K
+        <p className="mt-2 text-sm font-medium text-amber-200/85">
+          A platform folio — crisp jump-and-run flow, charged burst strikes, and
+          a hero who reads the stage like turning a page.
+        </p>
+        <p className="mt-1.5 text-xs text-amber-200/55">
+          Lab escape · move/jump · E turns the page (read) · Z/J strike · K
+          fusion · R new run
         </p>
       </header>
       <canvas
         ref={canvasRef}
+        tabIndex={0}
+        role="application"
         width={VIEW_WIDTH}
         height={VIEW_HEIGHT}
-        className="max-w-full rounded-lg border border-zinc-700 bg-black shadow-lg"
-        aria-label="Ash Run gameplay canvas"
+        className="max-w-full rounded-md border-2 border-amber-900/50 bg-[#1a1612] shadow-[0_16px_48px_rgba(0,0,0,0.55)] outline-none ring-0 focus-visible:ring-2 focus-visible:ring-amber-500/40"
+        aria-label="Ash Run: platform jump and run, melee strike, E reads hazards and routes on the stage."
+        onPointerDown={(e) => {
+          e.currentTarget.focus();
+        }}
       />
     </div>
   );

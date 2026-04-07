@@ -39,10 +39,16 @@ export type Ash = {
   unstableChannel: UnstableChannel | null;
   /** Next fusion in the Bio → Mecha → Pure loop — same value shown on HUD. */
   unstableNextChannel: UnstableChannel;
-  /** Bio/Mecha: temporary movement style after unstable (Pure uses perception only). */
+  /** Bio/Mecha: temporary movement style after unstable (Pure uses route-sense only). */
   fusionMoveMs: number;
   fusionMoveChannel: UnstableChannel | null;
+  /** Pure unstable [K]: slow-mo route-sense window (PERCEPTION_SCALE). */
+  fusionPureSenseMs: number;
+  /** Active [E] “read space” — information only; real-time sim, no slow-mo. */
   perceptionRemainingMs: number;
+  perceptionCooldownRemainingMs: number;
+  /** True while `perceptionRemainingMs > 0` (set each step in step-game). */
+  perceptionActive: boolean;
   width: number;
   height: number;
 };

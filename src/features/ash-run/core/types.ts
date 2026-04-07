@@ -1,3 +1,4 @@
+import type { TimeShadowState } from "../perception/timeShadowSystem";
 import type { Ash, PatrolEnemy } from "../entities/types";
 import type { LevelDef } from "../level/types";
 
@@ -22,6 +23,8 @@ export type GameState = {
   hazardAccMs: number;
   /** Ms of sim freeze remaining; decremented by fixed dt, deterministic. */
   hitStopRemainingMs: number;
+  /** Recent traces for spatial read (E) — render consumes via getVisibleTimeShadows / getVisibleShadows. */
+  timeShadow: TimeShadowState;
 };
 
 export type InputBits = {
@@ -35,4 +38,7 @@ export type InputBits = {
   attackPressed: boolean;
   unstable: boolean;
   unstablePressed: boolean;
+  /** Read space / time-shadows — Key E (edge + hold). */
+  perception: boolean;
+  perceptionPressed: boolean;
 };

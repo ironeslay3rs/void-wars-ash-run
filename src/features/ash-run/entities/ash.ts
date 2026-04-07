@@ -44,7 +44,10 @@ export function createAsh(spawnX: number, spawnY: number): Ash {
     unstableNextChannel: 0,
     fusionMoveMs: 0,
     fusionMoveChannel: null,
+    fusionPureSenseMs: 0,
     perceptionRemainingMs: 0,
+    perceptionCooldownRemainingMs: 0,
+    perceptionActive: false,
     width: ASH_WIDTH,
     height: ASH_HEIGHT,
   };

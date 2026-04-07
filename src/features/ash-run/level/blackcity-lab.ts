@@ -3,20 +3,33 @@ import type { LevelDef } from "./types";
 /**
  * Blackcity Lab Escape — single authored slice.
  *
+ * Perception (time-shadow / read [E]) is authored into the layout: narrow floor
+ * rungs between hazards, split pools, and multi-speed drones reward **reading**
+ * ghost traces and danger hints — not raw reflex. The slice stays **clearable**
+ * without perception (tighter timing, more trial-and-error), fairer with it.
+ *
  * Pressure arc (layout + cadence only):
- * — Early lab (z1–2): softer pools, wider grate — controlled read.
- * — Lockdown mid (z3–5): faster drones, meaner pool, tight ledge — lab reacting.
- * — Escape final (z7–8): sentinel + hatch bite — short safe windows, move now.
+ * — Early lab (z1–2): softer pools + **nail rung** between acids — safe line is thin.
+ * — Lockdown mid (z3–5): **split lock pool** — only the center nail is floor-safe.
+ * — Drone corridor: **three** out-of-sync patrols — crossing reads off shadow traces.
+ * — Escape final (z7–8): **chamber entry puddles** + **split hatch bite** — slit safe.
+ *
+ * Where perception helps most (ghost path + hazard echo + patrol traces):
+ * — **Wash:** lip rung after pool 2 + gap nail — shows safe floor commits after acids.
+ * — **Drones:** desynced starts/speeds — crossing windows read off enemy shadows, not one rhythm.
+ * — **Lock:** asymmetric split pool — center nail is the fair line; echoes show mis-steps.
+ * — **Sentinel entry:** staggered puddle widths — slit between them is the read.
+ * — **Hatch:** narrow center nail between bite segments — commitment without a GPS.
  *
  * Flow (left → right):
  * 1. Containment — wide clean steps + high trim; no hostiles.
- * 2. Wash — two beats; first pool gentler, second step-up.
- * 3. Drone corridor — crossing pressure, raised cadence.
+ * 2. Wash — two beats; gap rung between pools (hidden safe at floor).
+ * 3. Drone corridor — triple crossing pressure; longer patrols for readable shadows.
  * 4. Relief climb — stairs into checkpoint.
- * 5. Lock approach — pinch + hot pool before seal.
+ * 5. Lock approach — pinch + **split** hot pool (center rung) before seal.
  * 6. Boss gate — seal trigger.
- * 7. Sentinel chamber — arena.
- * 8. Hatch run — floor bite + tight climb to exit.
+ * 7. Sentinel chamber — entry puddles past wall; arena frame.
+ * 8. Hatch run — **split** floor bite + tight climb to exit.
  */
 export function createBlackcityLabLevel(): LevelDef {
   const floorY = 480;
@@ -25,7 +38,7 @@ export function createBlackcityLabLevel(): LevelDef {
 
   return {
     id: "blackcity_lab_escape",
-    name: "Blackcity Lab Escape",
+    name: "Blackcity Lab — Folio I",
     width: W,
     height: 600,
     entities: [
@@ -55,7 +68,11 @@ export function createBlackcityLabLevel(): LevelDef {
         h: 50,
         dps: 2.12,
       },
+      /* Nail between pools — 28px gap; perception makes the safe line obvious. */
+      { kind: "solid", x: 1080, y: floorY - 10, w: 28, h: 10 },
       { kind: "solid", x: 966, y: 374, w: 204, h: 18 },
+      /* Lip rung: last floor bite after pool 2 — trail shows the commit onto dry floor. */
+      { kind: "solid", x: 1276, y: floorY - 10, w: 12, h: 10 },
       /* +8px left: cleaner landing after second pool on first attempt */
       { kind: "solid", x: 1272, y: 432, w: 128, h: 20 },
 
@@ -67,14 +84,14 @@ export function createBlackcityLabLevel(): LevelDef {
       {
         kind: "patrol",
         id: "drone_a",
-        x: 1775,
+        x: 1782,
         y: floorY - 30,
         w: 28,
         h: 28,
-        vx: -100,
-        patrolLeft: 1422,
-        patrolRight: 1802,
-        hp: 2,
+        vx: -106,
+        patrolLeft: 1406,
+        patrolRight: 1820,
+        hp: 1,
         damage: 1,
         isMiniboss: false,
         hurtCooldownMs: 0,
@@ -82,14 +99,29 @@ export function createBlackcityLabLevel(): LevelDef {
       {
         kind: "patrol",
         id: "drone_b",
-        x: 1448,
+        x: 1455,
         y: floorY - 30,
         w: 28,
         h: 28,
-        vx: 96,
+        vx: 100,
         patrolLeft: 1430,
-        patrolRight: 1790,
-        hp: 2,
+        patrolRight: 1795,
+        hp: 1,
+        damage: 1,
+        isMiniboss: false,
+        hurtCooldownMs: 0,
+      },
+      {
+        kind: "patrol",
+        id: "drone_c",
+        x: 1634,
+        y: floorY - 30,
+        w: 28,
+        h: 28,
+        vx: -72,
+        patrolLeft: 1450,
+        patrolRight: 1795,
+        hp: 1,
         damage: 1,
         isMiniboss: false,
         hurtCooldownMs: 0,
@@ -111,11 +143,21 @@ export function createBlackcityLabLevel(): LevelDef {
       /* --- Zone 5: lock approach — tension before seal --- */
       { kind: "solid", x: 2280, y: 304, w: 32, h: 176 },
       { kind: "solid", x: 2560, y: 286, w: 32, h: 194 },
+      /* Split lock pool — asymmetric acids + center nail (same total width; read favors center). */
       {
         kind: "hazard",
         x: 2344,
         y: floorY - 36,
-        w: 136,
+        w: 48,
+        h: 36,
+        dps: 2.48,
+      },
+      { kind: "solid", x: 2392, y: floorY - 12, w: 32, h: 12 },
+      {
+        kind: "hazard",
+        x: 2424,
+        y: floorY - 36,
+        w: 56,
         h: 36,
         dps: 2.48,
       },
@@ -130,7 +172,7 @@ export function createBlackcityLabLevel(): LevelDef {
         w: 44,
         h: 520,
         enterLine:
-          "Floor shudders—red wash seals behind her. No questions. Deep lab's the door. Run.",
+          "Floor shudders—red wash seals behind her.\nNo questions. Deep lab's the door. Run.",
       },
 
       /* --- Zone 7: sentinel chamber — deliberate arena frame --- */
@@ -139,12 +181,40 @@ export function createBlackcityLabLevel(): LevelDef {
       { kind: "solid", x: 3208, y: 358, w: 48, h: 122 },
       { kind: "solid", x: 2880, y: 268, w: 200, h: 20 },
 
-      /* --- Zone 8: hatch run — floor strip forces hop off blind sprint --- */
+      /* Chamber entry: staggered puddle widths — slit + nail are the fair line (not symmetric). */
+      {
+        kind: "hazard",
+        x: 2758,
+        y: floorY - 30,
+        w: 32,
+        h: 30,
+        dps: 2.1,
+      },
+      { kind: "solid", x: 2790, y: floorY - 11, w: 28, h: 11 },
+      {
+        kind: "hazard",
+        x: 2818,
+        y: floorY - 30,
+        w: 36,
+        h: 30,
+        dps: 2.1,
+      },
+
+      /* --- Zone 8: hatch run — split floor bite; center nail rewards spatial read --- */
       {
         kind: "hazard",
         x: 3178,
         y: floorY - 26,
-        w: 94,
+        w: 38,
+        h: 26,
+        dps: 2.36,
+      },
+      { kind: "solid", x: 3216, y: floorY - 12, w: 24, h: 12 },
+      {
+        kind: "hazard",
+        x: 3240,
+        y: floorY - 26,
+        w: 32,
         h: 26,
         dps: 2.36,
       },

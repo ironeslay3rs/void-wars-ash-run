@@ -220,7 +220,8 @@ export function stepBasicCombat(
   dummies = dummies.map((d) => {
     let hurtCooldownMs = Math.max(0, d.hurtCooldownMs - dtMs);
     let hitFlashMs = Math.max(0, d.hitFlashMs - dtMs);
-    let { x, y, vx, vy, hp } = d;
+    let { x, y, vx, vy } = d;
+    const hp = d.hp;
     x += (vx * dtMs) / 1000;
     y += (vy * dtMs) / 1000;
     vx *= t.knockbackDecay;

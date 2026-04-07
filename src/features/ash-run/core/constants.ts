@@ -26,8 +26,9 @@ export const JUMP_VELOCITY = -545;
 
 /* Coyote + buffer +2 ms: small forgiveness for stepped climbs without
    widening the jump window into a second jump. */
-export const COYOTE_MS = 126;
-export const JUMP_BUFFER_MS = 140;
+/* +6 ms: thin lab nails and lips forgive a hair more — still committed jumps. */
+export const COYOTE_MS = 132;
+export const JUMP_BUFFER_MS = 145;
 
 /* After a real fall onto ground, horizontal speed is scaled once so lips and
    small platforms don’t feel like ice. See step-game (vy threshold). */
@@ -41,7 +42,7 @@ export const LANDING_VY_THRESHOLD = 130;
    slide. Vertical kill on start makes the burst feel “locked in”. */
 export const DASH_SPEED = 755;
 export const DASH_MS = 105;
-export const DASH_COOLDOWN_MS = 680;
+export const DASH_COOLDOWN_MS = 640;
 
 /* When dash (or mecha dash) expires mid–fixed-step, horizontal carry is cut
    so the burst doesn’t read as a long post-dash slide. */
@@ -64,13 +65,17 @@ export const ATTACK_ACTIVE_MS = 72;
 export const UNSTABLE_MOTION_VX_MIN = 52;
 /** Cooldown ticks down faster while Ash is moving — rewards staying in flow. */
 export const UNSTABLE_COOLDOWN_RECHARGE_MUL = 1.16;
-export const UNSTABLE_COOLDOWN_MS = 3200;
+export const UNSTABLE_COOLDOWN_MS = 3000;
 export const UNSTABLE_FLASH_MS = 220;
 export const BIO_BURST_VX = 420;
 export const BIO_BURST_VY = -180;
 export const MECHA_DASH_MS = 88;
+/** Fusion Pure [K]: slow-mo route-sense duration (uses PERCEPTION_SCALE in step-game). */
 export const PERCEPTION_MS = 480;
 export const PERCEPTION_SCALE = 0.42;
+/** [E] Read space — hazard/route clarity only; no slow-mo, no combat buffs. */
+export const PERCEPTION_READ_DURATION_MS = 2600;
+export const PERCEPTION_READ_COOLDOWN_MS = 7800;
 /** Fusion as movement layer: Bio / Mecha windows after [K] (Pure uses perception time). */
 export const FUSION_BIO_MOVE_MS = 540;
 export const FUSION_MECHA_MOVE_MS = 460;
@@ -98,3 +103,11 @@ export const HIT_STOP_MS = 40;
 
 export const VIEW_WIDTH = 960;
 export const VIEW_HEIGHT = 540;
+
+/** Camera bias toward travel direction — frames the next read without a minimap. */
+export const CAMERA_LOOKAHEAD_PX = 54;
+
+/** Render-only follow: exponential smoothing toward sim `cameraX` (ms time constant). */
+export const CAMERA_SMOOTH_TAU_MS = 92;
+/** Snap instead of easing when the sim camera jumps (respawn, large correction). */
+export const CAMERA_SMOOTH_SNAP_PX = 300;
