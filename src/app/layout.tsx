@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppShell } from "@/components/shell/AppShell";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,9 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Void Wars: Ash Run",
+  title: { default: "Game Studio", template: "%s · Game Studio" },
   description:
-    "Ash escapes the Blackcity lab — 2D action platformer vertical slice.",
+    "Browser prototypes — grey-market survival and Void Wars: Ash Run. Local save.",
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -28,7 +30,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }

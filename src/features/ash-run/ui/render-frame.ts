@@ -13,7 +13,7 @@ import type { GameState } from "../core/types";
 import { getVisibleTimeShadows } from "../perception/timeShadowSystem";
 import type { Ash, PatrolEnemy } from "../entities/types";
 import { isHazard } from "../level/queries";
-import { drawHud } from "./hud";
+import { drawHud, type HudDrawOptions } from "./hud";
 
 /**
  * Time-shadow perception — render-only layers (no HUD here):
@@ -1584,6 +1584,8 @@ export function renderGameFrame(
   scratch: RenderScratch,
   nowMs: number,
   frameDtMs: number,
+  winHud?: { newRecord?: boolean } | null,
+  hudOptions?: HudDrawOptions | null,
 ): void {
   advanceScratch(scratch, state, frameDtMs);
 
@@ -1598,5 +1600,5 @@ export function renderGameFrame(
   drawGateSealSpike(ctx, scratch.tensionGateMs);
   drawEscapeFinaleTint(ctx, escPhase);
   drawHitStopScreenAccent(ctx, state.hitStopRemainingMs);
-  drawHud(ctx, state, nowMs);
+  drawHud(ctx, state, nowMs, winHud, hudOptions);
 }

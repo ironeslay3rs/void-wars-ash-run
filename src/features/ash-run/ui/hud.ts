@@ -1,3 +1,4 @@
+import { formatFolioTime } from "@/lib/format-folio-time";
 import {
   UNSTABLE_MOTION_VX_MIN,
   VIEW_HEIGHT,
@@ -18,15 +19,74 @@ function channelLabel(ch: 0 | 1 | 2): string {
   return ch === 0 ? "BIO" : ch === 1 ? "MECHA" : "PURE";
 }
 
+function minibossHudTitle(id: string): string {
+  if (id === "vault_warden") return "Warden";
+  if (id === "fracture_herald") return "Herald";
+  if (id === "reckoning_arbiter") return "Arbiter";
+  if (id === "closure_magistrate") return "Magistrate";
+  if (id === "exile_gatekeeper") return "Gatekeeper";
+  if (id === "horizon_sovereign") return "Sovereign";
+  if (id === "echo_custodian") return "Custodian";
+  if (id === "verge_harbinger") return "Harbinger";
+  if (id === "zenith_exarch") return "Exarch";
+  if (id === "terminus_adjudicator") return "Adjudicator";
+  if (id === "coda_curator") return "Curator";
+  if (id === "afterword_scribe") return "Scribe";
+  if (id === "postscript_archivist") return "Archivist";
+  if (id === "index_steward") return "Steward";
+  if (id === "appendix_binder") return "Binder";
+  return "Sentinel";
+}
+
+export type HudDrawOptions = {
+  /** Stored PB (ms) for this stage when the run started; pace hint only, not a replay ghost. */
+  personalBestMs?: number | null;
+};
+
 export function drawHud(
   ctx: CanvasRenderingContext2D,
   state: GameState,
   nowMs: number,
+  winHud?: { newRecord?: boolean } | null,
+  hudOptions?: HudDrawOptions | null,
 ): void {
   const { ash, beat, phase } = state;
 
   if (phase !== "won") {
     const sentinel = state.enemies.find((e) => e.isMiniboss && e.hp > 0);
+
+    ctx.textAlign = "right";
+    ctx.font = "12px ui-monospace, monospace";
+    ctx.fillStyle = "rgba(245, 237, 216, 0.78)";
+    ctx.fillText(
+      formatFolioTime(state.runElapsedMs ?? 0),
+      VIEW_WIDTH - 16,
+      14,
+    );
+
+    const pb = hudOptions?.personalBestMs;
+    const showPbPace = pb != null && Number.isFinite(pb) && pb > 0;
+    if (showPbPace) {
+      ctx.font = "10px ui-monospace, monospace";
+      ctx.fillStyle = "rgba(245, 237, 216, 0.42)";
+      ctx.fillText(`PB ${formatFolioTime(pb)}`, VIEW_WIDTH - 16, 28);
+      const el = state.runElapsedMs ?? 0;
+      const delta = el - pb;
+      if (el > 250) {
+        const tieBandMs = 80;
+        if (Math.abs(delta) < tieBandMs) {
+          ctx.fillStyle = "rgba(200, 200, 210, 0.55)";
+          ctx.fillText("vs PB · even", VIEW_WIDTH - 16, 41);
+        } else if (delta <= 0) {
+          ctx.fillStyle = "rgba(125, 211, 168, 0.85)";
+          ctx.fillText(`vs PB · −${formatFolioTime(-delta)}`, VIEW_WIDTH - 16, 41);
+        } else {
+          ctx.fillStyle = "rgba(251, 191, 36, 0.82)";
+          ctx.fillText(`vs PB · +${formatFolioTime(delta)}`, VIEW_WIDTH - 16, 41);
+        }
+      }
+    }
+    ctx.textAlign = "left";
 
     if (sentinel) {
       ctx.textAlign = "center";
@@ -37,7 +97,7 @@ export function drawHud(
       }
       ctx.fillStyle = hit ? "#e8e0ff" : "#c4b8e8";
       ctx.fillText(
-        `Sentinel  ${sentinel.hp} / ${LAB_SENTINEL_MAX_HP}`,
+        `${minibossHudTitle(sentinel.id)}  ${sentinel.hp} / ${LAB_SENTINEL_MAX_HP}`,
         VIEW_WIDTH / 2,
         20,
       );
@@ -49,7 +109,8 @@ export function drawHud(
     ctx.font = "14px system-ui, sans-serif";
     ctx.textAlign = "left";
     let hx = 16;
-    const hy = sentinel ? 40 : 28;
+    const hy = sentinel ? 52 : 40;
+    const unstableY = hy + 10;
     const ceilHp = Math.ceil(ash.hp);
     const lastHeart = ceilHp === 1;
     for (let i = 0; i < ash.maxHp; i++) {
@@ -69,7 +130,7 @@ export function drawHud(
     /* Right column: mobility + strike cooldowns (only when ticking) */
     ctx.textAlign = "right";
     ctx.font = "11px system-ui, sans-serif";
-    let ry = 26;
+    let ry = showPbPace ? 52 : 26;
     if (ash.dashRemainingMs > 0) {
       ctx.fillStyle = "#8cb4ff";
       ctx.fillText("dash · burst", VIEW_WIDTH - 16, ry);
@@ -106,9 +167,10 @@ export function drawHud(
           ? "ready"
           : "move first";
     const nextCh = channelLabel(ash.unstableNextChannel);
-    ctx.fillText(`Unstable [K]: ${unstableHud} · next ${nextCh}`, 16, 50);
+    ctx.fillText(`Unstable [K]: ${unstableHud} · next ${nextCh}`, 16, unstableY);
 
-    let fusionLineY = 82;
+    const readY = hy + 26;
+    let fusionLineY = readY + 16;
     {
       let readHud: string;
       if (ash.perceptionRemainingMs > 0) {
@@ -125,12 +187,12 @@ export function drawHud(
             ? "#778"
             : "#b8d8ec";
       ctx.font = "12px system-ui";
-      ctx.fillText(`Read [E]: ${readHud}`, 16, 66);
+      ctx.fillText(`Read [E]: ${readHud}`, 16, readY);
       if (ash.perceptionRemainingMs > 0) {
         ctx.font = "10px system-ui, sans-serif";
         ctx.fillStyle = "rgba(155, 215, 235, 0.88)";
-        ctx.fillText("traces · hazards · routes", 16, 80);
-        fusionLineY = 96;
+        ctx.fillText("traces · hazards · routes", 16, readY + 14);
+        fusionLineY = readY + 30;
       }
     }
 
@@ -157,7 +219,7 @@ export function drawHud(
     }
 
     const hasFusionRow = ash.fusionPureSenseMs > 0 || surgeRow;
-    const channelY = hasFusionRow ? fusionLineY + 20 : 86;
+    const channelY = hasFusionRow ? fusionLineY + 20 : readY + 20;
 
     const ch =
       ash.unstableChannel === 0
@@ -207,15 +269,35 @@ export function drawHud(
     ctx.textAlign = "center";
     ctx.fillStyle = "#f5edd8";
     ctx.font = 'italic bold 24px Georgia, "Times New Roman", serif';
-    ctx.fillText("The end of this folio", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - 28);
+    ctx.fillText("The end of this folio", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - 44);
+    ctx.font = "15px ui-monospace, monospace";
+    ctx.fillStyle = "#c9b896";
+    ctx.fillText(
+      `Time ${formatFolioTime(state.runElapsedMs ?? 0)}`,
+      VIEW_WIDTH / 2,
+      VIEW_HEIGHT / 2 - 14,
+    );
+    if (winHud?.newRecord) {
+      ctx.font = "13px Georgia, serif";
+      ctx.fillStyle = "#7dd3a8";
+      ctx.fillText("New personal best", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 10);
+    }
     ctx.font = "13px Georgia, serif";
     ctx.globalAlpha = 0.88 + 0.12 * Math.sin(nowMs * 0.0018);
     ctx.fillStyle = "#d4b896";
-    ctx.fillText("You read the room.", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - 2);
+    ctx.fillText(
+      "You read the room.",
+      VIEW_WIDTH / 2,
+      VIEW_HEIGHT / 2 + (winHud?.newRecord ? 34 : 14),
+    );
     ctx.globalAlpha = 1;
-    ctx.font = "13px system-ui, sans-serif";
+    ctx.font = "12px system-ui, sans-serif";
     ctx.fillStyle = "#b8a88c";
-    ctx.fillText("Press R to begin again", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 28);
+    ctx.fillText(
+      "M / Esc — folio map · R — run again",
+      VIEW_WIDTH / 2,
+      VIEW_HEIGHT / 2 + (winHud?.newRecord ? 58 : 38),
+    );
     ctx.textAlign = "left";
   }
 }

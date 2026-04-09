@@ -1,0 +1,201 @@
+import type { LevelDef } from "./types";
+
+/**
+ * Folio VI — closure. Unlocks after reckoning; exit sealed until the magistrate falls.
+ */
+export function createFolioClosureLevel(): LevelDef {
+  const floorY = 480;
+  const floorH = 120;
+  const W = 3380;
+
+  return {
+    id: "folio_vi_closure",
+    name: "Closure — Folio VI",
+    width: W,
+    height: 600,
+    entities: [
+      { kind: "solid", x: 0, y: floorY, w: W, h: floorH },
+
+      { kind: "solid", x: 40, y: 412, w: 170, h: 18 },
+      { kind: "solid", x: 250, y: 348, w: 190, h: 18 },
+      {
+        kind: "hazard",
+        x: 200,
+        y: floorY - 42,
+        w: 220,
+        h: 42,
+        dps: 2.12,
+      },
+      { kind: "solid", x: 480, y: 284, w: 150, h: 17 },
+      {
+        kind: "hazard",
+        x: 640,
+        y: floorY - 36,
+        w: 260,
+        h: 36,
+        dps: 2.3,
+      },
+      { kind: "solid", x: 620, y: 368, w: 36, h: 112 },
+
+      /* Four drones — final gauntlet pace */
+      { kind: "solid", x: 700, y: 328, w: 620, h: 24 },
+      {
+        kind: "patrol",
+        id: "closure_drone_a",
+        x: 920,
+        y: floorY - 30,
+        w: 28,
+        h: 28,
+        vx: -100,
+        patrolLeft: 740,
+        patrolRight: 1280,
+        hp: 1,
+        damage: 1,
+        isMiniboss: false,
+        hurtCooldownMs: 0,
+      },
+      {
+        kind: "patrol",
+        id: "closure_drone_b",
+        x: 1180,
+        y: floorY - 30,
+        w: 28,
+        h: 28,
+        vx: 92,
+        patrolLeft: 760,
+        patrolRight: 1260,
+        hp: 1,
+        damage: 1,
+        isMiniboss: false,
+        hurtCooldownMs: 0,
+      },
+      {
+        kind: "patrol",
+        id: "closure_drone_c",
+        x: 1050,
+        y: floorY - 30,
+        w: 28,
+        h: 28,
+        vx: -78,
+        patrolLeft: 780,
+        patrolRight: 1220,
+        hp: 1,
+        damage: 1,
+        isMiniboss: false,
+        hurtCooldownMs: 0,
+      },
+      {
+        kind: "patrol",
+        id: "closure_drone_d",
+        x: 860,
+        y: floorY - 30,
+        w: 28,
+        h: 28,
+        vx: 68,
+        patrolLeft: 820,
+        patrolRight: 1180,
+        hp: 1,
+        damage: 1,
+        isMiniboss: false,
+        hurtCooldownMs: 0,
+      },
+
+      { kind: "solid", x: 1340, y: 256, w: 140, h: 17 },
+      {
+        kind: "hazard",
+        x: 1390,
+        y: floorY - 40,
+        w: 160,
+        h: 40,
+        dps: 2.45,
+      },
+      { kind: "solid", x: 1550, y: 196, w: 200, h: 18 },
+
+      {
+        kind: "checkpoint",
+        id: "closure_mid",
+        x: 1600,
+        y: 188,
+        w: 48,
+        h: 76,
+      },
+
+      { kind: "solid", x: 1740, y: 296, w: 260, h: 22 },
+      {
+        kind: "hazard",
+        x: 1820,
+        y: floorY - 34,
+        w: 130,
+        h: 34,
+        dps: 2.36,
+      },
+      { kind: "solid", x: 2000, y: 236, w: 120, h: 16 },
+      {
+        kind: "hazard",
+        x: 2100,
+        y: floorY - 30,
+        w: 100,
+        h: 30,
+        dps: 2.33,
+      },
+
+      {
+        kind: "boss_gate",
+        x: 2240,
+        y: 0,
+        w: 44,
+        h: 520,
+        enterLine:
+          "Closure isn’t quiet—it’s final.\nMagistrate won’t stamp you through until you earn the exit.",
+      },
+
+      { kind: "solid", x: 2308, y: 174, w: 940, h: 28 },
+      { kind: "solid", x: 2348, y: 366, w: 52, h: 114 },
+      { kind: "solid", x: 3156, y: 366, w: 52, h: 114 },
+      {
+        kind: "hazard",
+        x: 2408,
+        y: floorY - 34,
+        w: 56,
+        h: 34,
+        dps: 2.24,
+      },
+      { kind: "solid", x: 2464, y: floorY - 12, w: 44, h: 12 },
+      {
+        kind: "hazard",
+        x: 2508,
+        y: floorY - 34,
+        w: 56,
+        h: 34,
+        dps: 2.24,
+      },
+      { kind: "solid", x: 2570, y: 292, w: 240, h: 22 },
+      {
+        kind: "hazard",
+        x: 2840,
+        y: floorY - 32,
+        w: 48,
+        h: 32,
+        dps: 2.4,
+      },
+      { kind: "solid", x: 2888, y: floorY - 11, w: 36, h: 11 },
+      {
+        kind: "hazard",
+        x: 2924,
+        y: floorY - 32,
+        w: 48,
+        h: 32,
+        dps: 2.4,
+      },
+      { kind: "solid", x: 2960, y: 408, w: 280, h: 22 },
+      { kind: "solid", x: 3120, y: 340, w: 160, h: 20 },
+      {
+        kind: "exit",
+        x: 3220,
+        y: 224,
+        w: 48,
+        h: 86,
+      },
+    ],
+  };
+}

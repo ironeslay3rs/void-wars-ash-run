@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
+/* Shared studio tokens — Survivor shell + hub (Ash Run keeps its own stage palette). */
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --studio-surface: #09090b;
+  --studio-surface-elevated: #18181b;
+  --studio-border: #27272a;
+  --studio-border-strong: #3f3f46;
+  --studio-accent: #fbbf24;
+  --studio-accent-dim: #a16207;
+  --studio-danger: #f87171;
+  --studio-success: #34d399;
+  --studio-muted: #a1a1aa;
 }
 
 @theme inline {
@@ -12,15 +22,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: var(--studio-surface);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }

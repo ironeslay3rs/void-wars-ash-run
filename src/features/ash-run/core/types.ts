@@ -23,6 +23,11 @@ export type GameState = {
   hazardAccMs: number;
   /** Ms of sim freeze remaining; decremented by fixed dt, deterministic. */
   hitStopRemainingMs: number;
+  /**
+   * In-game time this run: advances by fixed-step dt while playing.
+   * Does not advance during hit-stop (freeze frames don’t count).
+   */
+  runElapsedMs: number;
   /** Recent traces for spatial read (E) — render consumes via getVisibleTimeShadows / getVisibleShadows. */
   timeShadow: TimeShadowState;
 };

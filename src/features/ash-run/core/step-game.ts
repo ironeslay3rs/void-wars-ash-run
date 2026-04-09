@@ -1,4 +1,4 @@
-import { createLabSentinelMiniboss } from "../entities/enemy";
+import { createMinibossForLevel } from "../level/miniboss-registry";
 import type { Ash, UnstableChannel } from "../entities/types";
 import { findExit, isBossGate, isCheckpoint, isHazard, solidsOf } from "../level/queries";
 import type { Rect } from "../level/types";
@@ -110,6 +110,8 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     const next = Math.max(0, s.hitStopRemainingMs - dtMs);
     return { ...s, hitStopRemainingMs: next };
   }
+
+  s.runElapsedMs = (s.runElapsedMs ?? 0) + dtMs;
 
   const ash = { ...s.ash };
   const solids = solidsOf(s.level);
@@ -378,7 +380,7 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
 
   if (s.bossGateTriggered && !s.minibossSpawned) {
     s.minibossSpawned = true;
-    s.enemies = [...s.enemies, createLabSentinelMiniboss(floorY)];
+    s.enemies = [...s.enemies, createMinibossForLevel(s.level.id, floorY)];
   }
 
   const exit = findExit(s.level);
