@@ -1,12 +1,20 @@
 # Overall upgrade roadmap
 
-**Last plan refresh:** **Folio XVII** playable (`folio-appendix.ts`, **Binder**) — **ten drones**, **margin clamp + double-spine braid + squeeze** (3+4+3); **Folio XVIII** teaser (`folio_xviii_colophon`); sequel chapters still **vary layout before** adding an **11th** drone.
+**Last plan refresh:** **Folio XXXVII** playable (`folio-interlude.ts`, **Intervenor**); **Folio XXXVIII** roadmap teaser (`folio_xxxviii_postlude`); prior slice: Survivor **brisk heist** (175 cr), Ash Run **touch strip**, **playSfx** unlock/PB. Sequel chapters still **vary layout before** adding an **11th** drone.
 
 Single source of truth for cross-game and per-mode upgrades. **Status** is tracked here; ship work in vertical slices.
 
+### Priority stack (what “done” means)
+
+1. **Playability — core** — A folio or feature ships when it is **actually good to play**: readable geometry, fair patrol tempo, a gate duel that fits the arena, and honest unlocks. If it isn’t fun and clear under hand, it isn’t done—**no amount of lore saves a bad room**.
+2. **Mechanics — middle** — Systems (drone count bands, hazards, PB, linear repair, survivor economy) exist to **serve** that play: legible escalation, skill expression, retention. Mechanics can change; they must not drift into hidden difficulty or fake progression.
+3. **Lore — top** — Names, publishing metaphors, boss copy, and intro beats **dress** the mechanics and reward close reading. Lore **amplifies** play; it does **not** replace a playable map node or excuse a teaser masquerading as a stage.
+
+Vertical slices follow this order: **playable level + tests first**, then tighten mechanical edges, then tune voice and card copy.
+
 ## Plan at a glance
 
-1. **Ship the folio spine** — playable **I→XVII**; **XVIII+** as `roadmapOnly` until levels ship; **post–XII chapters** trade **new verbs** (trench, gulf, zipper + desks, stacks + catwalk, margins + braid, …) before raising patrol count.
+1. **Ship the folio spine** — playable **I→XXXVII**; **XXXVIII+** as `roadmapOnly` until levels ship; **post–XII chapters** trade **new verbs** (…, bleed trim + signature stitch + gather fold, …) before raising patrol count.
 2. **Polish runs** — in-game PB pace vs stored best (done); optional later: deterministic input replay ghost (skill expression + retry hook).
 3. **Keep survivor deep but local** — sprint/month, **iron**, meltdown, services; **heist** as alternate win vector; optional `runMode` enum if presets multiply.
 4. **Stay integration-light** — no accounts in this repo; CI + Vitest guard regressions.
@@ -32,7 +40,7 @@ Single source of truth for cross-game and per-mode upgrades. **Status** is track
 
 - **Folio I–II:** Onboard controls and reading; shorter Training yard as explicit low-stakes step.
 - **Folio III–XII:** Challenge band; each chapter adds **one more patrol drone** on the gauntlet (III→XII: 2→10) so escalation is legible.
-- **Folio XIII+ (sequel chapters):** Hold **drone count** at the XII bar when possible; vary **macro layout** so each folio tests a different mistake profile — e.g. **Coda** = trench + stepping + busy floor; **Afterword** = zigzag approach + **dual islands** + **gulf** commit; **Postscript** = **zipper** floor read + **tripartite** patrol blocks + **bridge** timing between desks; **Index** = **vertical spines** + **mezzanine cross-reference** + **shelf-tab** finish; **Appendix** = **ceiling/floor margin clamp** + **twin-spine braid** (floor + ribbon) + **closing squeeze**.
+- **Folio XIII+ (sequel chapters):** Hold **drone count** at the XII bar when possible; vary **macro layout** so each folio tests a different mistake profile — e.g. **Coda** = trench + stepping + busy floor; **Afterword** = zigzag approach + **dual islands** + **gulf** commit; **Postscript** = **zipper** floor read + **tripartite** patrol blocks + **bridge** timing between desks; **Index** = **vertical spines** + **mezzanine cross-reference** + **shelf-tab** finish; **Appendix** = **ceiling/floor margin clamp** + **twin-spine braid** (floor + ribbon) + **closing squeeze**; **Colophon** = **mirror bias** + **curtain columns** + **narrow seal lane** (printer’s mark); **Epilogue** = **U-void + bridge** + **relay tempo** + **twilight zipper** (last corridor); **Codex** = **center spine** + **facing pages** + **pit thread bridges** + **chronicler strip**; **Afterline** = **attest** side pinches + **hopscotch** islands over pits + **closing tread** teeth; **Vellum** = **shear veil** strips + **fold stack** tiers + **corona wax** clusters; **Endpaper** = **paste ladder** bands + **hinge sash** swing-tiers + **case tuck** pinch; **Flyleaf** = **deckle fray** teeth + **ruled void** grid + **press stamp** bars; **Halftitle** = **strike band** lines + **gutter bias** margin + **lead strip** cadence; **Frontispiece** = **plate frame** + **caption ledge** + **folio split**; **Title page** = **masthead lift** + **byline tread** + **imprint block**; **Copyright** = **statute strip** + **margin column** + **catalog block**; **Dedication** = **center well** + **ornament brackets** + **vow strip**; **Epigraph (XXX)** = **pull quote band** + **attribution rail** + **dash lead**; **Foreword (XXXI)** = **guest frame** + **aside column** + **handshake strip**; **Preface (XXXII)** = **raised thesis plinth** + **method rail** + **promise strip**; **Introduction (XXXIII)** = **threshold lintel** + **ingress bay** + **lede strip**; **Body matter (XXXIV)** = **measure column** + **rag ladder** + **river run**; **Incipit (XXXV)** = **drop cap plinth** + **ornament frieze** + **rubric runway**.
 - **Miniboss identity:** Unique patrol box + HUD title per chapter reinforces “this arena belongs to this antagonist.”
 - **Soft cap:** Do not add an **11th** patrol drone until playtests prove XII’s bar is solved; prefer layout and hazard choreography first.
 
@@ -54,11 +62,11 @@ Single source of truth for cross-game and per-mode upgrades. **Status** is track
 
 | Phase | Theme | Target outcome |
 |-------|--------|----------------|
-| **A–D** | Foundation + both modes | ✅ Hub, survivor economy/win, Ash folio I–XVII + XVIII teaser, CI, PWA, tests. |
-| **C (ongoing)** | Folio spine | Playable chain through XVII; roadmap for XVIII+; save repair on new chapters. |
-| **F** | Ash depth | ✅ XVII shipped (appendix braid); **XVIII playable** or **controls legend / PB ghost** next. |
-| **G** | Survivor presets | Multiple heist bars ✅; optional third preset or numeric goal later. |
-| **H** | Polish | PB replay ghost, controls legend, audio pass, touch-friendly Ash Run if needed. |
+| **A–D** | Foundation + both modes | ✅ Hub, survivor economy/win, Ash folio I–XXXVII + XXXVIII teaser, CI, PWA, tests. |
+| **C (ongoing)** | Folio spine | Playable chain through XXXVII; roadmap for XXXVIII+; save repair on new chapters. |
+| **F** | Ash depth | ✅ XXXVII shipped (interlude **Intervenor**); **PB replay ghost** or **XXXVIII playable** next. |
+| **G** | Survivor presets | ✅ Three heist bars (400 / 250 / 175 cr); optional numeric goal later. |
+| **H** | Polish | ✅ Controls legend; ✅ unlock/PB SFX; ✅ touch strip; PB replay ghost optional. |
 | **E** | Product asks only | Accounts, cloud saves, multiplayer, leaderboards. |
 
 ## Vision
@@ -88,7 +96,7 @@ Single source of truth for cross-game and per-mode upgrades. **Status** is track
 |------|---------|
 | Stress crisis | **Meltdown** at 100 stress + 2-day cooldown (`nextMeltdownAllowedAfterDay`). |
 | Services | **Intel** (8 cr), **Clinic repair** (48 cr, once) — disabled on **iron** runs (`ironman`). |
-| Run starts | Month / sprint; **Iron** (no clinic); **Heist** with **400** and **250** cr presets; `hardReset(day, ironman, creditsWinTarget?)`. |
+| Run starts | Month / sprint; **Iron** (no clinic); **Heist** with **400**, **250**, and **175** cr presets; `hardReset(day, ironman, creditsWinTarget?)`. |
 | Log variety | `logFlavors.ts` pools. |
 | Design tokens | `--studio-*` in `globals.css`; shell + hub. |
 
@@ -113,7 +121,30 @@ Single source of truth for cross-game and per-mode upgrades. **Status** is track
 | **Folio XV playable** | ✅ `folio_xv_postscript` in `FOLIO_STAGE_ORDER`; `folio-postscript.ts`; HUD **Archivist**; **ten drones** (3+4+3) + zipper opener + hazard gaps / micro-bridges between blocks; unlock after XIV. Saves: repair adds XV when XIV was already cleared. |
 | **Folio XVI playable** | ✅ `folio_xvi_index` in `FOLIO_STAGE_ORDER`; `folio-index.ts`; HUD **Steward**; **ten drones** (3+3+4) + spine hazards + mezzanine band + tab shelves; unlock after XV. Saves: repair adds XVI when XV was already cleared. |
 | **Folio XVII playable** | ✅ `folio_xvii_appendix` in `FOLIO_STAGE_ORDER`; `folio-appendix.ts`; HUD **Binder**; **ten drones** (3+4+3) + margin clamp + double-spine braid + squeeze; unlock after XVI. Saves: repair adds XVII when XVI was already cleared. |
-| **Folio XVIII on map** | ✅ `folio_xviii_colophon` teaser (`roadmapOnly`); lock hint points players to XVII as latest playable. |
+| **Folio XVIII playable** | ✅ `folio_xviii_colophon` in `FOLIO_STAGE_ORDER`; `folio-colophon.ts`; HUD **Compositor**; **ten drones** (3+4+3) + mirror imprint + curtain bands + seal channel; unlock after XVII. Saves: repair adds XVIII when XVII was already cleared. |
+| **Folio XIX playable** | ✅ `folio_xix_epilogue` in `FOLIO_STAGE_ORDER`; `folio-epilogue.ts`; HUD **Witness**; **ten drones** (3+4+3) + void ring + relay strip + twilight teeth; unlock after XVIII. Saves: repair adds XIX when XVIII was already cleared. |
+| **Folio XX playable** | ✅ `folio_xx_codex` in `FOLIO_STAGE_ORDER`; `folio-codex.ts`; HUD **Chronicler**; **ten drones** (3+4+3) + spine/facing pages + thread bridges + strip; unlock after XIX. Saves: repair adds XX when XIX was already cleared. |
+| **Folio XXI playable** | ✅ `folio_xxi_afterline` in `FOLIO_STAGE_ORDER`; `folio-afterline.ts`; HUD **Notary**; **ten drones** (3+4+3) + attest corridor + hopscotch relay + closing tread; unlock after XX. Saves: repair adds XXI when XX was already cleared. |
+| **Folio XXII playable** | ✅ `folio_xxii_vellum` in `FOLIO_STAGE_ORDER`; `folio-vellum.ts`; HUD **Illuminator**; **ten drones** (3+4+3) + shear veil + fold stack + corona wax; unlock after XXI. Saves: repair adds XXII when XXI was already cleared. |
+| **Folio XXIII playable** | ✅ `folio_xxiii_endpaper` in `FOLIO_STAGE_ORDER`; `folio-endpaper.ts`; HUD **Conservator**; **ten drones** (3+4+3) + paste ladder + hinge sash + case tuck; unlock after XXII. Saves: repair adds XXIII when XXII was already cleared. |
+| **Folio XXIV playable** | ✅ `folio_xxiv_flyleaf` in `FOLIO_STAGE_ORDER`; `folio-flyleaf.ts`; HUD **Prefacer**; **ten drones** (3+4+3) + deckle fray + ruled void + press stamp; unlock after XXIII. Saves: repair adds XXIV when XXIII was already cleared. |
+| **Folio XXV playable** | ✅ `folio_xxv_halftitle` in `FOLIO_STAGE_ORDER`; `folio-halftitle.ts`; HUD **Titler**; **ten drones** (3+4+3) + strike band + gutter bias + lead strip; unlock after XXIV. Saves: repair adds XXV when XXIV was already cleared. |
+| **Folio XXVI playable** | ✅ `folio_xxvi_frontispiece` in `FOLIO_STAGE_ORDER`; `folio-frontispiece.ts`; HUD **Engraver**; **ten drones** (3+4+3) + plate frame + caption ledge + folio split; unlock after XXV. Saves: repair adds XXVI when XXV was already cleared. |
+| **Folio XXVII playable** | ✅ `folio_xxvii_titlepage` in `FOLIO_STAGE_ORDER`; `folio-titlepage.ts`; HUD **Imprinter**; **ten drones** (3+4+3) + masthead lift + byline tread + imprint block; unlock after XXVI. Saves: repair adds XXVII when XXVI was already cleared. |
+| **Folio XXVIII playable** | ✅ `folio_xxviii_copyright` in `FOLIO_STAGE_ORDER`; `folio-copyright.ts`; HUD **Registrar**; **ten drones** (3+4+3) + statute strip + margin column + catalog block; unlock after XXVII. Saves: repair adds XXVIII when XXVII was already cleared. |
+| **Folio XXIX playable** | ✅ `folio_xxix_dedication` in `FOLIO_STAGE_ORDER`; `folio-dedication.ts`; HUD **Patron**; **ten drones** (3+4+3) + center well + ornament brackets + vow strip; unlock after XXVIII. Saves: repair adds XXIX when XXVIII was already cleared. |
+| **Folio XXX playable** | ✅ `folio_xxx_epigraph` in `FOLIO_STAGE_ORDER`; `folio-epigraph-page.ts`; HUD **Citer**; **ten drones** (3+4+3) + pull quote band + attribution rail + dash lead; unlock after XXIX. Saves: repair adds XXX when XXIX was already cleared. |
+| **Folio XXXI playable** | ✅ `folio_xxxi_foreword` in `FOLIO_STAGE_ORDER`; `folio-foreword.ts`; HUD **Interlocutor**; **ten drones** (3+4+3) + guest frame + aside column + handshake strip; unlock after XXX. Saves: repair adds XXXI when XXX was already cleared. |
+| **Folio XXXII playable** | ✅ `folio_xxxii_preface` in `FOLIO_STAGE_ORDER`; `folio-preface.ts`; HUD **Scrivener**; **ten drones** (3+4+3) + thesis plinth + method rail + promise strip; unlock after XXXI. Saves: repair adds XXXII when XXXI was already cleared. |
+| **Folio XXXIII playable** | ✅ `folio_xxxiii_introduction` in `FOLIO_STAGE_ORDER`; `folio-introduction.ts`; HUD **Usher**; **ten drones** (3+4+3) + threshold lintel + ingress bay + lede strip; unlock after XXXII. Saves: repair adds XXXIII when XXXII was already cleared. |
+| **Folio XXXIV playable** | ✅ `folio_xxxiv_body` in `FOLIO_STAGE_ORDER`; `folio-body.ts`; HUD **Galleyman**; **ten drones** (3+4+3) + measure column + rag ladder + river run; unlock after XXXIII. Saves: repair adds XXXIV when XXXIII was already cleared. |
+| **Folio XXXV playable** | ✅ `folio_xxxv_incipit` in `FOLIO_STAGE_ORDER`; `folio-incipit.ts`; HUD **Rubricator**; **ten drones** (3+4+3) + drop cap plinth + ornament frieze + rubric runway; unlock after XXXIV. Saves: repair adds XXXV when XXXIV was already cleared. |
+| **Folio XXXVI playable** | ✅ `folio_xxxvi_chapter` in `FOLIO_STAGE_ORDER`; `folio-chapter.ts`; HUD **Pager**; **ten drones** + running head / folio break / section ladder read; unlock after XXXV. Saves: repair adds XXXVI when XXXV was already cleared. |
+| **Folio XXXVII playable** | ✅ `folio_xxxvii_interlude` in `FOLIO_STAGE_ORDER`; `folio-interlude.ts`; HUD **Intervenor**; **ten drones** + bleed trim / signature stitch / gather fold; unlock after XXXVI. Saves: repair adds XXXVII when XXXVI was already cleared. |
+| **Folio XXXVIII on map** | ✅ `folio_xxxviii_postlude` teaser (`roadmapOnly`); lock hint names XXXVII as latest clearable chapter. |
+| **Ash Run controls legend** | ✅ `AshRunScene`: **H** toggles panel, **Esc** closes (then map), **Controls (H)** button; pause copy mentions H. |
+| **Touch strip** | ✅ Narrow screens: left / jump / right buttons driving `inputRef`. |
+| **SFX** | ✅ `playSfx("folio_unlock")` / `playSfx("personal_best")` — short Web Audio tones; no-op if blocked. |
 | Local PB ghost | ⏳ Full input replay + checksum (deferred). |
 
 ## Phase D — Cross-cutting
@@ -136,7 +167,7 @@ Multiplayer, accounts, cloud saves, full narrative tree, live leaderboards.
 
 **Iron:** `ironman` — clinic disabled (UI, key 9, action).
 
-**Heist:** `creditsWinTarget` — **400** (`HEIST_CREDITS_TARGET`) or **250** (`HEIST_CREDITS_LIGHT`); win when credits ≥ target while alive; **day goal still wins** too. Buttons in `RunResetRow`.
+**Heist:** `creditsWinTarget` — **400** (`HEIST_CREDITS_TARGET`), **250** (`HEIST_CREDITS_LIGHT`), or **175** (`HEIST_CREDITS_BRISK`); win when credits ≥ target while alive; **day goal still wins** too. Buttons in `RunResetRow`.
 
 Not implemented: “pacifist” score. Optional `runMode` enum later if modes multiply.
 
@@ -148,7 +179,7 @@ Not implemented: “pacifist” score. Optional `runMode` enum later if modes mu
 
 ## Next slices (priority order)
 
-1. **Ash Run:** **Folio XVIII playable** — new **macro verb** (distinct from prior sequel chapters); still **no 11th drone** until play data demands it.
-2. **Cross-cutting:** **controls legend** (Ash Run) — lowers skill floor as the spine grows.
-3. **Ash Run:** **input-replay PB ghost** when design + bandwidth allow.
-4. **Survivor:** optional third heist tier or numeric input; richer `runMode` if presets become unwieldy.
+1. **Ash Run:** **Folio XXXVIII playable** (`folio_xxxviii_postlude` or successor id) — new macro layout; still **no 11th drone** until play data demands it; add **`folio_xxxix_*` roadmap** teaser when the slice lands.
+2. **Ash Run:** **input-replay PB ghost** when design + bandwidth allow.
+3. **Survivor:** optional numeric heist goal or richer `runMode` if presets become unwieldy.
+4. **Polish:** optional mid-folio checkpoints (design decision); fuller SFX / music pass if desired.

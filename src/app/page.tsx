@@ -31,7 +31,7 @@ export default function StudioHubPage() {
             Black Market Survivor
           </span>
           <span className="mt-2 text-sm text-zinc-400">
-            Meltdown, fence, intel — month, sprint, iron, or heist (400 / 250 cr).
+            Meltdown, fence, intel — month, sprint, iron, or heist (400 / 250 / 175 cr).
           </span>
           <span
             className="mt-4 text-sm font-medium"
@@ -56,7 +56,7 @@ export default function StudioHubPage() {
             Void Wars: Ash Run
           </span>
           <span className="mt-2 text-sm text-zinc-400">
-            Folios I–XVII + roadmap XVIII — map, PB pace, linear unlocks.
+            Folios I–XXXVII + roadmap XXXVIII — map, PB pace, linear unlocks.
           </span>
           <span
             className="mt-4 text-sm font-medium"

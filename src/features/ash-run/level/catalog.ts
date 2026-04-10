@@ -3,15 +3,35 @@ import { createFolioFractureLevel } from "./folio-fracture";
 import { createFolioClosureLevel } from "./folio-closure";
 import { createFolioExileLevel } from "./folio-exile";
 import { createFolioEchoLevel } from "./folio-echo";
+import { createFolioEpilogueLevel } from "./folio-epilogue";
 import { createFolioHorizonLevel } from "./folio-horizon";
 import { createFolioReckoningLevel } from "./folio-reckoning";
 import { createFolioVergeLevel } from "./folio-verge";
 import { createFolioVaultLevel } from "./folio-vault";
 import { createFolioAppendixLevel } from "./folio-appendix";
+import { createFolioAfterlineLevel } from "./folio-afterline";
+import { createFolioVellumLevel } from "./folio-vellum";
+import { createFolioEndpaperLevel } from "./folio-endpaper";
+import { createFolioFlyleafLevel } from "./folio-flyleaf";
+import { createFolioHalftitleLevel } from "./folio-halftitle";
+import { createFolioFrontispieceLevel } from "./folio-frontispiece";
+import { createFolioCopyrightLevel } from "./folio-copyright";
+import { createFolioDedicationLevel } from "./folio-dedication";
+import { createFolioEpigraphPageLevel } from "./folio-epigraph-page";
+import { createFolioForewordLevel } from "./folio-foreword";
+import { createFolioPrefaceLevel } from "./folio-preface";
+import { createFolioIntroductionLevel } from "./folio-introduction";
+import { createFolioBodyMatterLevel } from "./folio-body";
+import { createFolioIncipitLevel } from "./folio-incipit";
+import { createFolioChapterLevel } from "./folio-chapter";
+import { createFolioInterludeLevel } from "./folio-interlude";
+import { createFolioTitlepageLevel } from "./folio-titlepage";
 import { createFolioAfterwordLevel } from "./folio-afterword";
 import { createFolioIndexLevel } from "./folio-index";
 import { createFolioPostscriptLevel } from "./folio-postscript";
 import { createFolioCodaLevel } from "./folio-coda";
+import { createFolioCodexLevel } from "./folio-codex";
+import { createFolioColophonLevel } from "./folio-colophon";
 import { createFolioTerminusLevel } from "./folio-terminus";
 import { createFolioZenithLevel } from "./folio-zenith";
 import { createTrainingYardLevel } from "./training-yard";
@@ -38,6 +58,26 @@ export const FOLIO_STAGE_ORDER = [
   "folio_xv_postscript",
   "folio_xvi_index",
   "folio_xvii_appendix",
+  "folio_xviii_colophon",
+  "folio_xix_epilogue",
+  "folio_xx_codex",
+  "folio_xxi_afterline",
+  "folio_xxii_vellum",
+  "folio_xxiii_endpaper",
+  "folio_xxiv_flyleaf",
+  "folio_xxv_halftitle",
+  "folio_xxvi_frontispiece",
+  "folio_xxvii_titlepage",
+  "folio_xxviii_copyright",
+  "folio_xxix_dedication",
+  "folio_xxx_epigraph",
+  "folio_xxxi_foreword",
+  "folio_xxxii_preface",
+  "folio_xxxiii_introduction",
+  "folio_xxxiv_body",
+  "folio_xxxv_incipit",
+  "folio_xxxvi_chapter",
+  "folio_xxxvii_interlude",
 ] as const;
 
 /** Stages you can actually load into Ash Run (excludes roadmap-only nodes). */
@@ -192,8 +232,148 @@ export const FOLIO_STAGES: readonly FolioStageMeta[] = [
   {
     id: "folio_xviii_colophon",
     mapLabel: "Folio XVIII",
-    mapSub: "Colophon (teaser)",
+    mapSub: "Colophon",
     estMinutes: 68,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xix_epilogue",
+    mapLabel: "Folio XIX",
+    mapSub: "Epilogue",
+    estMinutes: 72,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xx_codex",
+    mapLabel: "Folio XX",
+    mapSub: "Codex",
+    estMinutes: 76,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxi_afterline",
+    mapLabel: "Folio XXI",
+    mapSub: "Afterline",
+    estMinutes: 80,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxii_vellum",
+    mapLabel: "Folio XXII",
+    mapSub: "Vellum",
+    estMinutes: 84,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxiii_endpaper",
+    mapLabel: "Folio XXIII",
+    mapSub: "Endpaper",
+    estMinutes: 88,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxiv_flyleaf",
+    mapLabel: "Folio XXIV",
+    mapSub: "Flyleaf",
+    estMinutes: 92,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxv_halftitle",
+    mapLabel: "Folio XXV",
+    mapSub: "Halftitle",
+    estMinutes: 96,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxvi_frontispiece",
+    mapLabel: "Folio XXVI",
+    mapSub: "Frontispiece",
+    estMinutes: 100,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxvii_titlepage",
+    mapLabel: "Folio XXVII",
+    mapSub: "Title page",
+    estMinutes: 104,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxviii_copyright",
+    mapLabel: "Folio XXVIII",
+    mapSub: "Copyright",
+    estMinutes: 108,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxix_dedication",
+    mapLabel: "Folio XXIX",
+    mapSub: "Dedication",
+    estMinutes: 112,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxx_epigraph",
+    mapLabel: "Folio XXX",
+    mapSub: "Epigraph",
+    estMinutes: 116,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxi_foreword",
+    mapLabel: "Folio XXXI",
+    mapSub: "Foreword",
+    estMinutes: 120,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxii_preface",
+    mapLabel: "Folio XXXII",
+    mapSub: "Preface",
+    estMinutes: 124,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxiii_introduction",
+    mapLabel: "Folio XXXIII",
+    mapSub: "Introduction",
+    estMinutes: 128,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxiv_body",
+    mapLabel: "Folio XXXIV",
+    mapSub: "Body matter",
+    estMinutes: 132,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxv_incipit",
+    mapLabel: "Folio XXXV",
+    mapSub: "Incipit",
+    estMinutes: 136,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxvi_chapter",
+    mapLabel: "Folio XXXVI",
+    mapSub: "Chapter",
+    estMinutes: 140,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxvii_interlude",
+    mapLabel: "Folio XXXVII",
+    mapSub: "Interlude",
+    estMinutes: 144,
+    difficulty: "challenge",
+  },
+  {
+    id: "folio_xxxviii_postlude",
+    mapLabel: "Folio XXXVIII",
+    mapSub: "Postlude (teaser)",
+    estMinutes: 148,
     difficulty: "challenge",
     roadmapOnly: true,
   },
@@ -212,8 +392,8 @@ export function folioLockHint(
   const meta = FOLIO_STAGES.find((s) => s.id === stageId);
   if (!meta) return null;
   if (meta.roadmapOnly) {
-    if (meta.id === "folio_xviii_colophon") {
-      return "In development — Folio XVII is the latest chapter you can clear today.";
+    if (meta.id === "folio_xxxviii_postlude") {
+      return "In development — Folio XXXVII is the latest chapter you can clear today.";
     }
     return "Coming in a future update.";
   }
@@ -261,6 +441,46 @@ export function createLevelForId(id: string): LevelDef {
       return createFolioIndexLevel();
     case "folio_xvii_appendix":
       return createFolioAppendixLevel();
+    case "folio_xviii_colophon":
+      return createFolioColophonLevel();
+    case "folio_xix_epilogue":
+      return createFolioEpilogueLevel();
+    case "folio_xx_codex":
+      return createFolioCodexLevel();
+    case "folio_xxi_afterline":
+      return createFolioAfterlineLevel();
+    case "folio_xxii_vellum":
+      return createFolioVellumLevel();
+    case "folio_xxiii_endpaper":
+      return createFolioEndpaperLevel();
+    case "folio_xxiv_flyleaf":
+      return createFolioFlyleafLevel();
+    case "folio_xxv_halftitle":
+      return createFolioHalftitleLevel();
+    case "folio_xxvi_frontispiece":
+      return createFolioFrontispieceLevel();
+    case "folio_xxvii_titlepage":
+      return createFolioTitlepageLevel();
+    case "folio_xxviii_copyright":
+      return createFolioCopyrightLevel();
+    case "folio_xxix_dedication":
+      return createFolioDedicationLevel();
+    case "folio_xxx_epigraph":
+      return createFolioEpigraphPageLevel();
+    case "folio_xxxi_foreword":
+      return createFolioForewordLevel();
+    case "folio_xxxii_preface":
+      return createFolioPrefaceLevel();
+    case "folio_xxxiii_introduction":
+      return createFolioIntroductionLevel();
+    case "folio_xxxiv_body":
+      return createFolioBodyMatterLevel();
+    case "folio_xxxv_incipit":
+      return createFolioIncipitLevel();
+    case "folio_xxxvi_chapter":
+      return createFolioChapterLevel();
+    case "folio_xxxvii_interlude":
+      return createFolioInterludeLevel();
     default:
       return createBlackcityLabLevel();
   }
@@ -367,6 +587,126 @@ export function introBeatForLevel(id: string): {
         id: "intro_appendix",
         text: "Appendix — ten drones, margins then braid.\nIndex sorted the stacks; this adds ceiling bites, twin spines, and a squeeze—then the binder signs off.",
         ttlMs: 6200,
+      };
+    case "folio_xviii_colophon":
+      return {
+        id: "intro_colophon",
+        text: "Colophon — ten drones, mirror and curtain.\nAppendix braided spines; this one stamps symmetry, weaves bands, then locks the seal—compositor’s mark.",
+        ttlMs: 6400,
+      };
+    case "folio_xix_epilogue":
+      return {
+        id: "intro_epilogue",
+        text: "Epilogue — ten drones, void ring then relay.\nColophon sealed the impression; this is the last corridor—then the witness signs your run.",
+        ttlMs: 6600,
+      };
+    case "folio_xx_codex":
+      return {
+        id: "intro_codex",
+        text: "Codex — ten drones, spine and thread.\nEpilogue closed the corridor; this binds facing pages, stitches pits, then the chronicler shelves the run.",
+        ttlMs: 6800,
+      };
+    case "folio_xxi_afterline":
+      return {
+        id: "intro_afterline",
+        text: "Afterline — ten drones, corridor then hopscotch.\nCodex bound the witness; this line attests the aisle, stitches islands, then treads to the notary.",
+        ttlMs: 7000,
+      };
+    case "folio_xxii_vellum":
+      return {
+        id: "intro_vellum",
+        text: "Vellum — ten drones, veil then fold stack.\nAfterline attested the line; this skin shears light, stacks tiers, then wax-bites to the illuminator.",
+        ttlMs: 7200,
+      };
+    case "folio_xxiii_endpaper":
+      return {
+        id: "intro_endpaper",
+        text: "Endpaper — ten drones, paste then hinge.\nVellum gilded the skin; this sheet ladders bands, swings tiers, then tucks the case before the conservator.",
+        ttlMs: 7400,
+      };
+    case "folio_xxiv_flyleaf":
+      return {
+        id: "intro_flyleaf",
+        text: "Flyleaf — ten drones, deckle then ruled void.\nEndpaper tucked the case; this blank frays the edge, grids silence, then presses to the prefacer.",
+        ttlMs: 7600,
+      };
+    case "folio_xxv_halftitle":
+      return {
+        id: "intro_halftitle",
+        text: "Halftitle — ten drones, strike then gutter.\nFlyleaf pressed the blank; this page runs one band, biases the margin, then leads the strip to the titler.",
+        ttlMs: 7800,
+      };
+    case "folio_xxvi_frontispiece":
+      return {
+        id: "intro_frontispiece",
+        text: "Frontispiece — ten drones, frame then caption.\nHalftitle struck the line; this plate mats an image, shelves the caption, then splits the folio to the engraver.",
+        ttlMs: 8000,
+      };
+    case "folio_xxvii_titlepage":
+      return {
+        id: "intro_titlepage",
+        text: "Title page — ten drones, masthead then byline.\nFrontispiece cut the plate; this spread lifts the head, treads the credit, then blocks the imprint before the imprinter.",
+        ttlMs: 8200,
+      };
+    case "folio_xxviii_copyright":
+      return {
+        id: "intro_copyright",
+        text: "Copyright — ten drones, statute then margin column.\nTitle page set the imprint; this page stacks the law, runs the spine, then boxes the catalog before the registrar.",
+        ttlMs: 8400,
+      };
+    case "folio_xxix_dedication":
+      return {
+        id: "intro_dedication",
+        text: "Dedication — ten drones, center well then brackets.\nCopyright filed the statute; this page frames the vow, flares the ornaments, then strips the promise before the patron.",
+        ttlMs: 8600,
+      };
+    case "folio_xxx_epigraph":
+      return {
+        id: "intro_epigraph",
+        text: "Epigraph — ten drones, pull quote then attribution.\nDedication spoke the vow; this page pulls the line, rails the cite, then dashes the lead before the citer.",
+        ttlMs: 8800,
+      };
+    case "folio_xxxi_foreword":
+      return {
+        id: "intro_foreword",
+        text: "Foreword — ten drones, guest frame then aside.\nEpigraph cited the line; this chapter frames the stranger, runs the margin aside, then shakes hands down the strip before the interlocutor.",
+        ttlMs: 9000,
+      };
+    case "folio_xxxii_preface":
+      return {
+        id: "intro_preface",
+        text: "Preface — ten drones, thesis plinth then method rail.\nForeword was the guest voice; this page is ours—stack the claim, run the method, promise the strip before the scrivener.",
+        ttlMs: 9200,
+      };
+    case "folio_xxxiii_introduction":
+      return {
+        id: "intro_introduction",
+        text: "Introduction — ten drones, lintel then ingress bay.\nPreface filed the promise; this chapter frames the door, commits the pockets, runs the lede before the usher.",
+        ttlMs: 9400,
+      };
+    case "folio_xxxiv_body":
+      return {
+        id: "intro_body",
+        text: "Body matter — ten drones, measure column then rag ladder.\nIntroduction crossed the door; this is the text block—set the measure, climb the breaks, ride the river before the galleyman.",
+        ttlMs: 9600,
+      };
+    case "folio_xxxv_incipit":
+      return {
+        id: "intro_incipit",
+        text: "Incipit — ten drones, drop cap then ornament frieze.\nBody matter set the column; this line opens the chapter—plinth the cap, rail the rule, run the rubric before the rubricator.",
+        ttlMs: 9800,
+      };
+    case "folio_xxxvi_chapter":
+      return {
+        id: "intro_chapter",
+        text: "Chapter — ten drones, running head then folio break.\nIncipit opened the line; this folio turns—band the head, break the page, climb the sections before the pager.",
+        ttlMs: 10000,
+      };
+    case "folio_xxxvii_interlude":
+      return {
+        id: "intro_interlude",
+        text: "Interlude — ten drones, bleed trim then signature stitch.\nChapter turned the leaf; this breath trims the edge, threads the midline, gathers the fold before the intervenor.",
+        ttlMs: 10200,
       };
     default:
       return {

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   applyGameAction,
+  HEIST_CREDITS_BRISK,
   HEIST_CREDITS_LIGHT,
   HEIST_CREDITS_TARGET,
 } from "./gameActions";
@@ -118,6 +119,17 @@ describe("applyGameAction", () => {
         creditsWinTarget: HEIST_CREDITS_LIGHT,
       }),
       credits: HEIST_CREDITS_LIGHT - 1,
+    };
+    const s1 = applyGameAction(s0, { type: "sell_scrap" });
+    expect(s1.victory).toBe(true);
+  });
+
+  it("brisk heist wins at lowest credit threshold", () => {
+    const s0: GameState = {
+      ...createInitialGameState(15, {
+        creditsWinTarget: HEIST_CREDITS_BRISK,
+      }),
+      credits: HEIST_CREDITS_BRISK - 1,
     };
     const s1 = applyGameAction(s0, { type: "sell_scrap" });
     expect(s1.victory).toBe(true);

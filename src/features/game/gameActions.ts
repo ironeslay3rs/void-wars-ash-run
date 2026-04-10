@@ -27,6 +27,8 @@ export const CLINIC_REPAIR_HP_BONUS = 5;
 export const HEIST_CREDITS_TARGET = 400;
 /** Shorter heist preset — same rules, lower credit bar. */
 export const HEIST_CREDITS_LIGHT = 250;
+/** Fast heist — lowest credit bar for quick runs. */
+export const HEIST_CREDITS_BRISK = 175;
 
 export const UPGRADE_CATALOG: Record<
   UpgradeId,

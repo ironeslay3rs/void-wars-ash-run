@@ -111,8 +111,8 @@ export function WorldMap({
           Choose a stage
         </h1>
         <p className="mt-2 text-sm text-amber-200/75">
-          Eighteen cards — seventeen playable through appendix, plus a roadmap
-          teaser ahead. Beat each unlocked stage once to open the next; PB chases
+          Thirty-eight cards — thirty-seven playable through interlude, plus a roadmap teaser
+          ahead. Beat each unlocked stage once to open the next; PB chases
           stay open on clears.
         </p>
       </header>

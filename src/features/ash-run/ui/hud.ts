@@ -35,6 +35,26 @@ function minibossHudTitle(id: string): string {
   if (id === "postscript_archivist") return "Archivist";
   if (id === "index_steward") return "Steward";
   if (id === "appendix_binder") return "Binder";
+  if (id === "colophon_compositor") return "Compositor";
+  if (id === "epilogue_witness") return "Witness";
+  if (id === "codex_chronicler") return "Chronicler";
+  if (id === "afterline_notary") return "Notary";
+  if (id === "vellum_illuminator") return "Illuminator";
+  if (id === "endpaper_conservator") return "Conservator";
+  if (id === "flyleaf_prefacer") return "Prefacer";
+  if (id === "halftitle_titler") return "Titler";
+  if (id === "frontispiece_engraver") return "Engraver";
+  if (id === "titlepage_imprinter") return "Imprinter";
+  if (id === "copyright_registrar") return "Registrar";
+  if (id === "dedication_patron") return "Patron";
+  if (id === "epigraph_citer") return "Citer";
+  if (id === "foreword_interlocutor") return "Interlocutor";
+  if (id === "preface_scrivener") return "Scrivener";
+  if (id === "introduction_usher") return "Usher";
+  if (id === "body_galleyman") return "Galleyman";
+  if (id === "incipit_rubricator") return "Rubricator";
+  if (id === "chapter_pager") return "Pager";
+  if (id === "interlude_intervenor") return "Intervenor";
   return "Sentinel";
 }
 

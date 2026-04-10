@@ -1,4 +1,8 @@
-import { HEIST_CREDITS_LIGHT, HEIST_CREDITS_TARGET } from "@/features/game/gameActions";
+import {
+  HEIST_CREDITS_BRISK,
+  HEIST_CREDITS_LIGHT,
+  HEIST_CREDITS_TARGET,
+} from "@/features/game/gameActions";
 import type { VictoryTargetDay } from "@/features/game/gameTypes";
 
 const BTN =
@@ -66,7 +70,8 @@ export function RunResetRow({
             : "mb-1 mt-1 text-center text-[10px] text-zinc-500"
         }
       >
-        Standard {HEIST_CREDITS_TARGET} cr · light {HEIST_CREDITS_LIGHT} cr
+        Standard {HEIST_CREDITS_TARGET} cr · light {HEIST_CREDITS_LIGHT} cr · brisk{" "}
+        {HEIST_CREDITS_BRISK} cr
       </p>
       <div className={ironWrap}>
         <button
@@ -126,6 +131,36 @@ export function RunResetRow({
           onClick={() => hardReset(15, true, HEIST_CREDITS_LIGHT)}
         >
           Iron heist {HEIST_CREDITS_LIGHT} · Sprint
+        </button>
+      </div>
+      <div className={ironWrap}>
+        <button
+          type="button"
+          className={BTN}
+          onClick={() => hardReset(30, false, HEIST_CREDITS_BRISK)}
+        >
+          Heist {HEIST_CREDITS_BRISK} · 30d
+        </button>
+        <button
+          type="button"
+          className={BTN}
+          onClick={() => hardReset(15, false, HEIST_CREDITS_BRISK)}
+        >
+          Heist {HEIST_CREDITS_BRISK} · Sprint
+        </button>
+        <button
+          type="button"
+          className={BTN}
+          onClick={() => hardReset(30, true, HEIST_CREDITS_BRISK)}
+        >
+          Iron heist {HEIST_CREDITS_BRISK} · 30
+        </button>
+        <button
+          type="button"
+          className={BTN}
+          onClick={() => hardReset(15, true, HEIST_CREDITS_BRISK)}
+        >
+          Iron heist {HEIST_CREDITS_BRISK} · Sprint
         </button>
       </div>
     </div>

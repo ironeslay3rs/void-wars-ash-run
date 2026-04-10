@@ -55,6 +55,11 @@ export function AshRunScene({
   useLayoutEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+  const [showControls, setShowControls] = useState(false);
+  const showControlsRef = useRef(false);
+  useLayoutEffect(() => {
+    showControlsRef.current = showControls;
+  }, [showControls]);
 
   const resetRun = useCallback(() => {
     winNotifiedRef.current = false;
@@ -96,6 +101,11 @@ export function AshRunScene({
       if (e.code !== "KeyM" && e.code !== "Escape") return;
       const t = e.target;
       if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) return;
+      if (e.code === "Escape" && showControlsRef.current) {
+        e.preventDefault();
+        setShowControls(false);
+        return;
+      }
       e.preventDefault();
       setPaused(false);
       onBackToMap();
@@ -103,6 +113,18 @@ export function AshRunScene({
     window.addEventListener("keydown", toMap);
     return () => window.removeEventListener("keydown", toMap);
   }, [onBackToMap]);
+
+  useEffect(() => {
+    const toggleHelp = (e: KeyboardEvent) => {
+      if (e.code !== "KeyH" || e.repeat) return;
+      const t = e.target;
+      if (t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) return;
+      e.preventDefault();
+      setShowControls((v) => !v);
+    };
+    window.addEventListener("keydown", toggleHelp);
+    return () => window.removeEventListener("keydown", toggleHelp);
+  }, []);
 
   useEffect(() => {
     const togglePause = (e: KeyboardEvent) => {
@@ -241,17 +263,24 @@ export function AshRunScene({
             a hero who reads the stage like turning a page.
           </p>
           <p className="mt-1.5 text-xs text-amber-200/55">
-            Lab escape · move/jump · E turns the page (read) · Z/J strike · K
-            fusion · R new run
+            Lab escape · move/jump · E read · Z/J strike · K fusion · P pause · H
+            controls · R new run
           </p>
         </header>
       ) : (
         <p className="max-w-4xl text-center text-xs text-amber-200/55">
-          P — pause · M / Esc — folio map · R — restart · move · jump · E read · Z/J · K
-          fusion
+          P — pause · M / Esc — folio map · H — controls · R — restart · move · jump · E
+          read · Z/J · K fusion
         </p>
       )}
       <div className="relative inline-block max-w-full">
+        <button
+          type="button"
+          className="absolute right-0 top-0 z-[5] rounded-bl-md border border-amber-800/60 bg-[#1a1612]/95 px-2.5 py-1 text-[11px] font-medium text-amber-200/90 shadow-sm hover:bg-amber-950/50"
+          onClick={() => setShowControls(true)}
+        >
+          Controls (H)
+        </button>
         <canvas
           ref={canvasRef}
           tabIndex={0}
@@ -272,10 +301,168 @@ export function AshRunScene({
           >
             <p className="font-serif text-lg font-semibold text-[#f5edd8]">Paused</p>
             <p className="max-w-xs text-xs text-amber-200/80">
-              P — resume · M / Esc — folio map
+              P — resume · M / Esc — folio map · H — controls
             </p>
           </div>
         ) : null}
+        {showControls ? (
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-[#0a0908]/88 p-3"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ash-controls-title"
+          >
+            <div className="max-h-[min(420px,70vh)] w-full max-w-md overflow-y-auto rounded-lg border border-amber-800/50 bg-[#14110e] px-4 py-3 text-left shadow-xl">
+              <h2
+                id="ash-controls-title"
+                className="font-serif text-base font-semibold text-[#f5edd8]"
+              >
+                Controls
+              </h2>
+              <dl className="mt-3 space-y-2 text-xs text-amber-100/90">
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Move</dt>
+                  <dd className="text-right">← → or A D</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Jump</dt>
+                  <dd className="text-right">↑ W Space</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Dash</dt>
+                  <dd className="text-right">Shift</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Strike</dt>
+                  <dd className="text-right">Z J</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Fusion</dt>
+                  <dd className="text-right">
+                    K — cycles Bio → Mecha → Pure (HUD shows next)
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Read</dt>
+                  <dd className="text-right">
+                    E — perception / time-shadows on hazards & routes
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Pause</dt>
+                  <dd className="text-right">P</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-amber-900/30 pb-2">
+                  <dt className="text-amber-200/75">Folio map</dt>
+                  <dd className="text-right">M Esc</dd>
+                </div>
+                <div className="flex justify-between gap-4 pb-1">
+                  <dt className="text-amber-200/75">Restart run</dt>
+                  <dd className="text-right">R</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-[11px] text-amber-200/55">
+                H — close this panel · Esc also closes
+              </p>
+              <button
+                type="button"
+                className="mt-3 w-full rounded border border-amber-700/50 bg-amber-950/40 py-2 text-sm font-medium text-amber-100 hover:bg-amber-900/40"
+                onClick={() => setShowControls(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div
+        className="sm:hidden grid w-full max-w-full touch-none select-none grid-cols-[1fr_auto_1fr] gap-2"
+        style={{ maxWidth: VIEW_WIDTH }}
+        aria-hidden
+      >
+        <button
+          type="button"
+          className="flex h-14 items-center justify-center rounded-md border border-amber-800/50 bg-amber-950/40 text-xs font-medium text-amber-200/90 active:bg-amber-900/50"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            (e.target as HTMLButtonElement).setPointerCapture(e.pointerId);
+            inputRef.current.left = true;
+          }}
+          onPointerUp={(e) => {
+            inputRef.current.left = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* already released */
+            }
+          }}
+          onPointerCancel={(e) => {
+            inputRef.current.left = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* */
+            }
+          }}
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          className="flex min-w-[4.5rem] h-14 items-center justify-center rounded-md border border-amber-800/50 bg-amber-950/40 text-xs font-medium text-amber-200/90 active:bg-amber-900/50"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            (e.target as HTMLButtonElement).setPointerCapture(e.pointerId);
+            const i = inputRef.current;
+            if (!i.jump) i.jumpPressed = true;
+            i.jump = true;
+          }}
+          onPointerUp={(e) => {
+            inputRef.current.jump = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* */
+            }
+          }}
+          onPointerCancel={(e) => {
+            inputRef.current.jump = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* */
+            }
+          }}
+        >
+          Jump
+        </button>
+        <button
+          type="button"
+          className="flex h-14 items-center justify-center rounded-md border border-amber-800/50 bg-amber-950/40 text-xs font-medium text-amber-200/90 active:bg-amber-900/50"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            (e.target as HTMLButtonElement).setPointerCapture(e.pointerId);
+            inputRef.current.right = true;
+          }}
+          onPointerUp={(e) => {
+            inputRef.current.right = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* */
+            }
+          }}
+          onPointerCancel={(e) => {
+            inputRef.current.right = false;
+            try {
+              (e.target as HTMLButtonElement).releasePointerCapture(e.pointerId);
+            } catch {
+              /* */
+            }
+          }}
+        >
+          →
+        </button>
       </div>
     </div>
   );

@@ -306,3 +306,383 @@ export function createAppendixBinderMiniboss(floorY: number): PatrolEnemy {
     hurtCooldownMs: 0,
   };
 }
+
+/** Folio XVIII compositor — patrol matches `folio-colophon` arena floor. */
+export function createColophonCompositorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "colophon_compositor",
+    x: 5780,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -58,
+    patrolLeft: 5120,
+    patrolRight: 6436,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XIX witness — patrol matches `folio-epilogue` arena floor. */
+export function createEpilogueWitnessMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "epilogue_witness",
+    x: 6980,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 54,
+    patrolLeft: 6340,
+    patrolRight: 7656,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XX chronicler — patrol matches `folio-codex` arena floor. */
+export function createCodexChroniclerMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "codex_chronicler",
+    x: 7260,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -50,
+    patrolLeft: 6620,
+    patrolRight: 7936,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXI notary — patrol matches `folio-afterline` arena floor. */
+export function createAfterlineNotaryMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "afterline_notary",
+    x: 7580,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -44,
+    patrolLeft: 6920,
+    patrolRight: 8236,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXII illuminator — patrol matches `folio-vellum` arena floor. */
+export function createVellumIlluminatorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "vellum_illuminator",
+    x: 7660,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 46,
+    patrolLeft: 7000,
+    patrolRight: 8316,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXIII conservator — patrol matches `folio-endpaper` arena floor. */
+export function createEndpaperConservatorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "endpaper_conservator",
+    x: 7740,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -42,
+    patrolLeft: 7080,
+    patrolRight: 8396,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXIV prefacer — patrol matches `folio-flyleaf` arena floor. */
+export function createFlyleafPrefacerMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "flyleaf_prefacer",
+    x: 7880,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 44,
+    patrolLeft: 7160,
+    patrolRight: 8556,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXV titler — patrol matches `folio-halftitle` arena floor. */
+export function createHalftitleTitlerMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "halftitle_titler",
+    x: 7960,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -40,
+    patrolLeft: 7240,
+    patrolRight: 8636,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXVI engraver — patrol matches `folio-frontispiece` arena floor. */
+export function createFrontispieceEngraverMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "frontispiece_engraver",
+    x: 8040,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 38,
+    patrolLeft: 7320,
+    patrolRight: 8716,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXVII imprinter — patrol matches `folio-titlepage` arena floor. */
+export function createTitlepageImprinterMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "titlepage_imprinter",
+    x: 8120,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -34,
+    patrolLeft: 7400,
+    patrolRight: 8796,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXVIII registrar — patrol matches `folio-copyright` arena floor. */
+export function createCopyrightRegistrarMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "copyright_registrar",
+    x: 8200,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 32,
+    patrolLeft: 7480,
+    patrolRight: 8876,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXIX patron — patrol matches `folio-dedication` arena floor. */
+export function createDedicationPatronMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "dedication_patron",
+    x: 8280,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -30,
+    patrolLeft: 7560,
+    patrolRight: 8956,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXX citer — patrol matches `folio-epigraph-page` arena floor. */
+export function createEpigraphCiterMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "epigraph_citer",
+    x: 8360,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 28,
+    patrolLeft: 7640,
+    patrolRight: 9036,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXI interlocutor — patrol matches `folio-foreword` arena floor. */
+export function createForewordInterlocutorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "foreword_interlocutor",
+    x: 8440,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -26,
+    patrolLeft: 7720,
+    patrolRight: 9116,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXII scrivener — patrol matches `folio-preface` arena floor. */
+export function createPrefaceScrivenerMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "preface_scrivener",
+    x: 8520,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 26,
+    patrolLeft: 7800,
+    patrolRight: 9196,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXIII usher — patrol matches `folio-introduction` arena floor. */
+export function createIntroductionUsherMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "introduction_usher",
+    x: 8580,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -28,
+    patrolLeft: 7880,
+    patrolRight: 9276,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXIV galleyman — patrol matches `folio-body` arena floor. */
+export function createBodyGalleymanMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "body_galleyman",
+    x: 8660,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 28,
+    patrolLeft: 7960,
+    patrolRight: 9356,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXV rubricator — patrol matches `folio-incipit` arena floor. */
+export function createIncipitRubricatorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "incipit_rubricator",
+    x: 8740,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: -26,
+    patrolLeft: 8040,
+    patrolRight: 9436,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXVI pager — patrol matches `folio-chapter` arena floor. */
+export function createChapterPagerMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "chapter_pager",
+    x: 8820,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 26,
+    patrolLeft: 8120,
+    patrolRight: 9516,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
+
+/** Folio XXXVII intervenor — patrol matches `folio-interlude` arena floor. */
+export function createInterludeIntervenorMiniboss(floorY: number): PatrolEnemy {
+  return {
+    kind: "patrol",
+    id: "interlude_intervenor",
+    x: 8900,
+    y: floorY - 74,
+    w: 64,
+    h: 66,
+    vx: 26,
+    patrolLeft: 8200,
+    patrolRight: 9596,
+    hp: LAB_SENTINEL_MAX_HP,
+    damage: 1,
+    isMiniboss: true,
+    hurtCooldownMs: 0,
+  };
+}
