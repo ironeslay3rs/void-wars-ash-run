@@ -1,20 +1,14 @@
 /**
- * Time-shadow — pure logic for Ash’s “read spaces” ability.
- *
- * Lightweight traces only (no replay engine): enemy motion, hazard echoes,
- * and Ash’s recent route for readable path hints. Information-only; combat
- * sim does not consume this data for damage or hitboxes.
- *
- * Integration:
- * - Hold `TimeShadowState` on `GameState` as `timeShadow`.
- * - Each fixed step while playing: `updateTimeShadows(state.timeShadow, state, dtMs)`.
- * - Render (or HUD-free VFX): `getVisibleTimeShadows(state.timeShadow, state)` when perception is active.
+ * Time-shadow — pure logic for Ash's Resonance Sight.
+ * Canon: lore-canon/01 Master Canon/Schools/Pure - Resonance Sight.md
+ * Three strata: dynamic echoes, Ash's own recent route, authored traces
+ * (seeded at level creation). Information-only; no damage or hitboxes.
  */
 
 import { ashBounds, rectsOverlap } from "../core/collision";
 import type { Ash, PatrolEnemy } from "../entities/types";
-import type { LevelDef } from "../level/types";
-import { isHazard } from "../level/queries";
+import type { LevelDef, ResonanceTraceVolume } from "../level/types";
+import { isHazard, isResonanceTrace } from "../level/queries";
 
 /* -------------------------------------------------------------------------- */
 /* Tunables — short TTL, capped samples, small memory footprint               */
@@ -42,13 +36,7 @@ export type HazardEchoZone = {
   tMs: number;
 };
 
-/**
- * Mutable shadow buffer — passed by reference from `GameState.timeShadow`.
- *
- * - `routeHints`: recent Ash centers (safe-movement / path polyline source).
- * - `enemyGhostTrails`: per-id ring buffers of enemy centers.
- * - `hazardEchoZones`: short list of recent hazard overlap echoes.
- */
+/** Mutable shadow buffer — referenced from `GameState.timeShadow`. */
 export type TimeShadowState = {
   clockMs: number;
   lastAshSampleClock: number;
@@ -59,10 +47,7 @@ export type TimeShadowState = {
   wasInHazard: boolean;
 };
 
-/**
- * Minimal snapshot needed for updates and visibility — any matching object works
- * (e.g. full `GameState` without reading `timeShadow` inside these functions).
- */
+/** Minimal snapshot for updates — any matching object works (e.g. full GameState). */
 export type TimeShadowGameSnapshot = {
   level: LevelDef;
   ash: Ash;
@@ -80,6 +65,15 @@ export type VisibleTimeShadows = {
   dangerHints: Array<{ x: number; y: number; w: number; h: number; intensity: number }>;
   /** Thinned route polyline — “where movement was recently valid”; not a safety guarantee. */
   suggestedPath: Vec2[];
+  /**
+   * Authored resonance traces left by prior travelers — mana echoes Ash reads
+   * via Resonance Sight. Polylines only; render decides style by `kind`.
+   */
+  authoredTraces: Array<{
+    kind: ResonanceTraceVolume["traceKind"];
+    points: Vec2[];
+    intensity: number;
+  }>;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -96,6 +90,28 @@ export function createTimeShadowState(): TimeShadowState {
     hazardEchoZones: [],
     wasInHazard: false,
   };
+}
+
+/** Seed hazard pre-echoes so Resonance Sight surfaces danger before contact. */
+export function seedLevelPreEchoes(
+  shadowState: TimeShadowState,
+  level: LevelDef,
+): void {
+  for (let i = 0; i < level.entities.length; i++) {
+    const e = level.entities[i]!;
+    if (!isHazard(e) || !e.preEcho) continue;
+    shadowState.hazardEchoZones.push({
+      hazardKey: hazardKeyForEntityIndex(i),
+      x: e.x + e.w / 2,
+      y: e.y + e.h / 2,
+      /* Place the echo at "now" so it renders at full intensity when read
+         opens. Age decay is fine — this is a first-impression nudge. */
+      tMs: shadowState.clockMs,
+    });
+    if (shadowState.hazardEchoZones.length > MAX_HAZARD_ECHOES) {
+      shadowState.hazardEchoZones.shift();
+    }
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -219,6 +235,7 @@ export function getVisibleTimeShadows(
       enemyGhostPaths: new Map(),
       dangerHints: [],
       suggestedPath: [],
+      authoredTraces: [],
     };
   }
 
@@ -248,38 +265,27 @@ export function getVisibleTimeShadows(
 
   const suggestedPath = thinPolyline(ashGhostPath, SUGGESTED_PATH_MAX_POINTS);
 
+  const authoredTraces: VisibleTimeShadows["authoredTraces"] = [];
+  for (const ent of game.level.entities) {
+    if (!isResonanceTrace(ent)) continue;
+    const intensity =
+      typeof ent.intensityFalloff === "number"
+        ? Math.max(0, Math.min(1, ent.intensityFalloff))
+        : 0.75;
+    authoredTraces.push({
+      kind: ent.traceKind,
+      points: ent.points.map((p) => ({ x: p.x, y: p.y })),
+      intensity,
+    });
+  }
+
   return {
     active: true,
     ashGhostPath,
     enemyGhostPaths,
     dangerHints,
     suggestedPath,
+    authoredTraces,
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/* Legacy names — existing ash-run wiring (`GameState.timeShadow`, step-game) */
-/* -------------------------------------------------------------------------- */
-
-/** @deprecated Prefer `TimeShadowState` */
-export type TimeShadowBuffer = TimeShadowState;
-
-/** @deprecated Prefer `createTimeShadowState` */
-export const createTimeShadowBuffer = createTimeShadowState;
-
-export type TimeShadowWorldState = TimeShadowGameSnapshot & {
-  timeShadow: TimeShadowState;
-};
-
-/** @deprecated Prefer `updateTimeShadows(shadowState, game, dtMs)` */
-export function updateTimeShadow(world: TimeShadowWorldState, dtMs: number): void {
-  updateTimeShadows(world.timeShadow, world, dtMs);
-}
-
-/** @deprecated Prefer `getVisibleTimeShadows(state.timeShadow, state)` */
-export function getVisibleShadows(world: TimeShadowWorldState): VisibleTimeShadows {
-  return getVisibleTimeShadows(world.timeShadow, world);
-}
-
-/** @deprecated Alias of `HazardEchoZone` */
-export type HazardShadowEvent = HazardEchoZone;

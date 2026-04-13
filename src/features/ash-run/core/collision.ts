@@ -54,3 +54,41 @@ export function resolveY(
 export function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
+
+/**
+ * Probe which wall Ash's body is pressed against.
+ * Returns -1 (left), 1 (right), or 0 (none). Uses a tiny horizontal offset
+ * so a standing-adjacent solid registers without phantom overlaps.
+ */
+export function detectWallSide(
+  ash: Ash,
+  solids: Solid[],
+  probePx: number,
+): -1 | 0 | 1 {
+  const right: Rect = {
+    x: ash.x + probePx,
+    y: ash.y,
+    w: ash.width,
+    h: ash.height,
+  };
+  const left: Rect = {
+    x: ash.x - probePx,
+    y: ash.y,
+    w: ash.width,
+    h: ash.height,
+  };
+  let hitRight = false;
+  let hitLeft = false;
+  for (const s of solids) {
+    if (!hitRight && rectsOverlap(right, s) && !rectsOverlap(ashBounds(ash), s)) {
+      hitRight = true;
+    }
+    if (!hitLeft && rectsOverlap(left, s) && !rectsOverlap(ashBounds(ash), s)) {
+      hitLeft = true;
+    }
+    if (hitLeft && hitRight) break;
+  }
+  if (hitRight && !hitLeft) return 1;
+  if (hitLeft && !hitRight) return -1;
+  return 0;
+}

@@ -13,6 +13,7 @@ import type { GameState } from "../core/types";
 import { getVisibleTimeShadows } from "../perception/timeShadowSystem";
 import type { Ash, PatrolEnemy } from "../entities/types";
 import { isHazard } from "../level/queries";
+import { drawAuthoredTraces } from "./draw-authored-traces";
 import { drawHud, type HudDrawOptions } from "./hud";
 
 /**
@@ -1132,6 +1133,9 @@ function drawTimeShadowOverlays(
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
   }
+
+  /* --- Authored traces: survivor spines, victim frays, patrol whispers --- */
+  drawAuthoredTraces(ctx, vis.authoredTraces, nowMs, edgeFade, flick);
 
   /* --- Hazard echo (memory): tight bloom + thin ring — where danger was felt --- */
   for (const h of vis.dangerHints) {

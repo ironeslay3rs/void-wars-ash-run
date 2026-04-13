@@ -1,4 +1,6 @@
-import { createBlackcityLabLevel } from "./blackcity-lab";
+import { createBlackcityLabContainmentLevel } from "./blackcity-lab-containment";
+import { createBlackcityLabDeepLevel } from "./blackcity-lab-deep";
+import { createBlackcityLabHatchLevel } from "./blackcity-lab-hatch";
 import { createFolioFractureLevel } from "./folio-fracture";
 import { createFolioClosureLevel } from "./folio-closure";
 import { createFolioExileLevel } from "./folio-exile";
@@ -37,11 +39,13 @@ import { createFolioZenithLevel } from "./folio-zenith";
 import { createTrainingYardLevel } from "./training-yard";
 import type { LevelDef } from "./types";
 
-export const DEFAULT_LEVEL_ID = "blackcity_lab";
+export const DEFAULT_LEVEL_ID = "blackcity_lab_containment";
 
 /** Linear unlock chain: first clear of each id opens the next. */
 export const FOLIO_STAGE_ORDER = [
-  "blackcity_lab",
+  "blackcity_lab_containment",
+  "blackcity_lab_deep",
+  "blackcity_lab_hatch",
   "training_yard",
   "folio_iii_vault",
   "folio_iv_fracture",
@@ -85,6 +89,21 @@ export type FolioPlayableId = (typeof FOLIO_STAGE_ORDER)[number];
 
 export type FolioDifficulty = "tutorial" | "standard" | "challenge";
 
+/**
+ * Canonical territories of Ash's journey. Empire names (Verdant Coil /
+ * Chrome Synod / Ember Vault) are locked by `lore-canon/CLAUDE.md`; Black City
+ * is the neutral, chaotic territory where Map 1 begins.
+ *  - blackcity     : Black City (neutral, chaotic; Ash's starting ground)
+ *  - verdant_coil  : Bio empire (instinct, blood, mutation)
+ *  - chrome_synod  : Mecha empire (comprehension, frame, perfection)
+ *  - ember_vault   : Pure empire (wisdom, soul, resonance)
+ */
+export type CanonTerritory =
+  | "blackcity"
+  | "verdant_coil"
+  | "chrome_synod"
+  | "ember_vault";
+
 export type FolioStageMeta = {
   id: string;
   mapLabel: string;
@@ -95,6 +114,11 @@ export type FolioStageMeta = {
   difficulty?: FolioDifficulty;
   /** Shown on the map but not playable until a future content drop. */
   roadmapOnly?: boolean;
+  /**
+   * Canonical territory of this beat. Pinned stages use empire names in UI;
+   * unpinned stages remain "territory pending" until story canon locks them.
+   */
+  territory?: CanonTerritory;
 };
 
 export type FolioCanonFocus = {
@@ -116,11 +140,28 @@ export function folioMetaSummary(meta: FolioStageMeta): string | null {
 
 export const FOLIO_STAGES: readonly FolioStageMeta[] = [
   {
-    id: "blackcity_lab",
-    mapLabel: "Folio I",
-    mapSub: "Blackcity lab",
-    estMinutes: 8,
+    id: "blackcity_lab_containment",
+    mapLabel: "Folio I.a",
+    mapSub: "Blackcity lab — Containment",
+    estMinutes: 3,
+    difficulty: "tutorial",
+    territory: "blackcity",
+  },
+  {
+    id: "blackcity_lab_deep",
+    mapLabel: "Folio I.b",
+    mapSub: "Blackcity lab — Deep Lab",
+    estMinutes: 3,
     difficulty: "standard",
+    territory: "blackcity",
+  },
+  {
+    id: "blackcity_lab_hatch",
+    mapLabel: "Folio I.c",
+    mapSub: "Blackcity lab — Hatch",
+    estMinutes: 4,
+    difficulty: "standard",
+    territory: "blackcity",
   },
   {
     id: "training_yard",
@@ -128,6 +169,7 @@ export const FOLIO_STAGES: readonly FolioStageMeta[] = [
     mapSub: "Training yard",
     estMinutes: 3,
     difficulty: "tutorial",
+    territory: "blackcity",
   },
   {
     id: "folio_iii_vault",
@@ -390,6 +432,29 @@ export function folioMapLabel(stageId: string): string {
 }
 
 /**
+ * Canonical display name for a territory — empire names in UI ("Bio/Mecha/Pure"
+ * are shorthand only, per `lore-canon/CLAUDE.md`).
+ */
+export function territoryLabel(t: CanonTerritory): string {
+  switch (t) {
+    case "blackcity":
+      return "Black City";
+    case "verdant_coil":
+      return "Verdant Coil";
+    case "chrome_synod":
+      return "Chrome Synod";
+    case "ember_vault":
+      return "Ember Vault";
+  }
+}
+
+/** Canonical territory pinned to a stage, or null if not yet canon-pinned. */
+export function folioTerritory(stageId: string): CanonTerritory | null {
+  const m = FOLIO_STAGES.find((s) => s.id === stageId);
+  return m?.territory ?? null;
+}
+
+/**
  * Map-facing canon anchors inferred from the local vault's Black Market, Void,
  * and Three Schools notes so the board feels tied to Oblivion without inventing
  * a separate full lore sheet for every folio.
@@ -405,21 +470,21 @@ export function folioCanonFocus(stageId: string): FolioCanonFocus {
   }
 
   const idx = FOLIO_STAGE_ORDER.indexOf(stageId as FolioPlayableId);
-  if (idx <= 1) {
+  if (idx <= 3) {
     return {
       label: "Blackcity breach",
       note:
         "Ash starts where the Black Market fuses strains — not pure Bio, Mecha, or Pure, but a little of everything. The opening board favors clean routing over exposition.",
     };
   }
-  if (idx <= 11) {
+  if (idx <= 13) {
     return {
       label: "Void pressure",
       note:
         "The Void reads as exile and forced adaptation: treat the route like a law you learn once, then stop second-guessing under pressure.",
     };
   }
-  if (idx <= 23) {
+  if (idx <= 25) {
     return {
       label: "Mixed evolution",
       note:
@@ -456,8 +521,12 @@ export function folioLockHint(
 
 export function createLevelForId(id: string): LevelDef {
   switch (id) {
-    case "blackcity_lab":
-      return createBlackcityLabLevel();
+    case "blackcity_lab_containment":
+      return createBlackcityLabContainmentLevel();
+    case "blackcity_lab_deep":
+      return createBlackcityLabDeepLevel();
+    case "blackcity_lab_hatch":
+      return createBlackcityLabHatchLevel();
     case "training_yard":
       return createTrainingYardLevel();
     case "folio_iii_vault":
@@ -531,7 +600,7 @@ export function createLevelForId(id: string): LevelDef {
     case "folio_xxxvii_interlude":
       return createFolioInterludeLevel();
     default:
-      return createBlackcityLabLevel();
+      return createBlackcityLabContainmentLevel();
   }
 }
 
@@ -541,6 +610,27 @@ export function introBeatForLevel(id: string): {
   ttlMs: number;
 } {
   switch (id) {
+    case "blackcity_lab_containment":
+      return {
+        id: "intro_blackcity_lab_containment",
+        text:
+          "Ash — eight — a Black City lab has her. Containment cells, clean tile.\nTap jump for short hops, hold for full. Then run.",
+        ttlMs: 4200,
+      };
+    case "blackcity_lab_deep":
+      return {
+        id: "intro_blackcity_lab_deep",
+        text:
+          "Deep lab — a shaft drops between lock braces.\nKick one wall, then the other. Wall-jump to the seal.",
+        ttlMs: 4200,
+      };
+    case "blackcity_lab_hatch":
+      return {
+        id: "intro_blackcity_lab_hatch",
+        text:
+          "Hatch bay — sentinel rouses, seal stutters.\nResonance Sight: read the ink on the floor with E, then commit.",
+        ttlMs: 4200,
+      };
     case "training_yard":
       return {
         id: "intro_yard",

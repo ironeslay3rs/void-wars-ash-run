@@ -2,11 +2,16 @@ import { createAsh } from "../entities/ash";
 import {
   createLevelForId,
   DEFAULT_LEVEL_ID,
+  folioTerritory,
   introBeatForLevel,
 } from "../level/catalog";
 import { isPatrol, solidsOf } from "../level/queries";
-import { createTimeShadowState } from "../perception/timeShadowSystem";
+import {
+  createTimeShadowState,
+  seedLevelPreEchoes,
+} from "../perception/timeShadowSystem";
 import { ASH_HEIGHT } from "./constants";
+import { bpmForTerritory, createRhythmState } from "./rhythm";
 import type { GameState } from "./types";
 
 /** New run: Ash spawns with perception timers at 0; step-game drives [E] read. */
@@ -38,6 +43,13 @@ export function createInitialGameState(levelId: string = DEFAULT_LEVEL_ID): Game
     hazardAccMs: 0,
     hitStopRemainingMs: 0,
     runElapsedMs: 0,
-    timeShadow: createTimeShadowState(),
+    timeShadow: (() => {
+      const t = createTimeShadowState();
+      seedLevelPreEchoes(t, level);
+      return t;
+    })(),
+    perceptionHintShown: false,
+    perceptionEverUsed: false,
+    rhythm: createRhythmState(bpmForTerritory(folioTerritory(level.id))),
   };
 }

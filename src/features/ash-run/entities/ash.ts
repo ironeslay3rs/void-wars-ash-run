@@ -48,6 +48,9 @@ export function createAsh(spawnX: number, spawnY: number): Ash {
     perceptionRemainingMs: 0,
     perceptionCooldownRemainingMs: 0,
     perceptionActive: false,
+    wallContactSide: 0,
+    wallSlideActive: false,
+    wallJumpLockoutMs: 0,
     width: ASH_WIDTH,
     height: ASH_HEIGHT,
   };

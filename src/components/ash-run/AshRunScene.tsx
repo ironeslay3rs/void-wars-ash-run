@@ -253,7 +253,7 @@ export function AshRunScene({
       {!compact ? (
         <header className="max-w-4xl text-center">
           <p className="font-serif text-xs font-medium uppercase tracking-[0.2em] text-amber-600/90">
-            Chapter I · The borrowed page
+            Folio I · Black City lab — escape
           </p>
           <h1 className="mt-1 font-serif text-2xl font-semibold tracking-tight text-[#f5edd8]">
             Void Wars: Ash Run

@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   folioCanonFocus,
   folioLockHint,
+  folioTerritory,
   FOLIO_STAGE_ORDER,
   FOLIO_STAGES,
+  introBeatForLevel,
+  territoryLabel,
+  type CanonTerritory,
 } from "./catalog";
 
 describe("catalog", () => {
@@ -377,7 +381,9 @@ describe("catalog", () => {
   });
 
   it("canon focus frames the opening around Blackcity", () => {
-    expect(folioCanonFocus("blackcity_lab").label).toBe("Blackcity breach");
+    expect(folioCanonFocus("blackcity_lab_containment").label).toBe("Blackcity breach");
+    expect(folioCanonFocus("blackcity_lab_deep").label).toBe("Blackcity breach");
+    expect(folioCanonFocus("blackcity_lab_hatch").label).toBe("Blackcity breach");
   });
 
   it("canon focus frames mid-folios around mixed evolution", () => {
@@ -390,5 +396,87 @@ describe("catalog", () => {
 
   it("canon focus marks the teaser folio as roadmap-only", () => {
     expect(folioCanonFocus("folio_xxxviii_postlude").label).toBe("Roadmap signal");
+  });
+
+  it("Folio I.a intro beat names Ash and the Black City lab", () => {
+    const beat = introBeatForLevel("blackcity_lab_containment");
+    expect(beat.text).toContain("Ash");
+    expect(beat.text).toContain("Black City");
+  });
+
+  it("Folio I.b intro beat frames the deep-lab wall-jump shaft", () => {
+    const beat = introBeatForLevel("blackcity_lab_deep");
+    expect(beat.text.toLowerCase()).toContain("wall-jump");
+  });
+
+  it("Folio I.c intro beat frames the hatch beat and Resonance Sight", () => {
+    const beat = introBeatForLevel("blackcity_lab_hatch");
+    expect(beat.text).toContain("Resonance Sight");
+  });
+
+  it("Folio I is split: containment → deep → hatch prepend FOLIO_STAGE_ORDER, Hatch precedes Training Yard", () => {
+    const order = [...FOLIO_STAGE_ORDER];
+    expect(order[0]).toBe("blackcity_lab_containment");
+    expect(order[1]).toBe("blackcity_lab_deep");
+    expect(order[2]).toBe("blackcity_lab_hatch");
+    expect(order[3]).toBe("training_yard");
+  });
+
+  it("each lab beat showcases its verb: containment (variable jump), deep (wall jump), hatch (authored traces)", () => {
+    expect(introBeatForLevel("blackcity_lab_containment").text.toLowerCase()).toContain("jump");
+    expect(introBeatForLevel("blackcity_lab_deep").text.toLowerCase()).toContain("wall-jump");
+    expect(introBeatForLevel("blackcity_lab_hatch").text).toContain("Resonance Sight");
+  });
+
+  it("territoryLabel uses empire names, never Bio/Mecha/Pure shorthand", () => {
+    expect(territoryLabel("blackcity")).toBe("Black City");
+    expect(territoryLabel("verdant_coil")).toBe("Verdant Coil");
+    expect(territoryLabel("chrome_synod")).toBe("Chrome Synod");
+    expect(territoryLabel("ember_vault")).toBe("Ember Vault");
+    for (const t of [
+      "blackcity",
+      "verdant_coil",
+      "chrome_synod",
+      "ember_vault",
+    ] as CanonTerritory[]) {
+      const label = territoryLabel(t);
+      expect(label).not.toMatch(/\bBio\b/);
+      expect(label).not.toMatch(/\bMecha\b/);
+      expect(label).not.toMatch(/\bPure\b/);
+      expect(label).not.toMatch(/Spirit/i);
+    }
+  });
+
+  it("the four opening beats are pinned to Black City territory", () => {
+    expect(folioTerritory("blackcity_lab_containment")).toBe("blackcity");
+    expect(folioTerritory("blackcity_lab_deep")).toBe("blackcity");
+    expect(folioTerritory("blackcity_lab_hatch")).toBe("blackcity");
+    expect(folioTerritory("training_yard")).toBe("blackcity");
+  });
+
+  it("Folios beyond the lab+yard opening stay territory-pending (no invented canon)", () => {
+    const pinnedOpeners = new Set([
+      "blackcity_lab_containment",
+      "blackcity_lab_deep",
+      "blackcity_lab_hatch",
+      "training_yard",
+    ]);
+    for (const id of FOLIO_STAGE_ORDER) {
+      if (pinnedOpeners.has(id)) continue;
+      expect(folioTerritory(id)).toBeNull();
+    }
+  });
+
+  it("FOLIO_STAGES territories, if present, are one of the four canon tags", () => {
+    const allowed: CanonTerritory[] = [
+      "blackcity",
+      "verdant_coil",
+      "chrome_synod",
+      "ember_vault",
+    ];
+    for (const s of FOLIO_STAGES) {
+      if (s.territory == null) continue;
+      expect(allowed).toContain(s.territory);
+    }
   });
 });

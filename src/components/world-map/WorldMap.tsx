@@ -46,7 +46,7 @@ export function WorldMap({
     const lastUnlocked = [...nodes]
       .reverse()
       .find((n) => n.unlocked && !n.roadmapOnly);
-    return lastUnlocked?.id ?? nodes[0]?.id ?? "blackcity_lab";
+    return lastUnlocked?.id ?? nodes[0]?.id ?? "blackcity_lab_containment";
   });
 
   const selectedNode = useMemo(
@@ -86,11 +86,11 @@ export function WorldMap({
       }
       if (e.code === "Home") {
         e.preventDefault();
-        setSelectedId(nodes[0]?.id ?? "blackcity_lab");
+        setSelectedId(nodes[0]?.id ?? "blackcity_lab_containment");
       }
       if (e.code === "End") {
         e.preventDefault();
-        setSelectedId(nodes[nodes.length - 1]?.id ?? "blackcity_lab");
+        setSelectedId(nodes[nodes.length - 1]?.id ?? "blackcity_lab_containment");
       }
       if (e.code === "Enter" || e.code === "Space") {
         if (!selectedNode?.unlocked || selectedNode.roadmapOnly) return;

@@ -5,6 +5,7 @@ import type { Rect } from "../level/types";
 import {
   ashBounds,
   clamp,
+  detectWallSide,
   rectsOverlap,
   resolveX,
   resolveY,
@@ -50,9 +51,22 @@ import {
   UNSTABLE_COOLDOWN_RECHARGE_MUL,
   UNSTABLE_FLASH_MS,
   UNSTABLE_MOTION_VX_MIN,
+  VARIABLE_JUMP_RELEASE_FACTOR,
   VIEW_WIDTH,
+  WALL_CONTACT_PROBE_PX,
+  WALL_JUMP_LOCKOUT_MS,
+  WALL_JUMP_POP_SPEED,
+  WALL_JUMP_VY_FACTOR,
+  WALL_SLIDE_FALL_CAP,
+  PURE_WALL_LOCKOUT_FORGIVENESS,
 } from "./constants";
 import { updateTimeShadows } from "../perception/timeShadowSystem";
+import { advanceRhythm } from "./rhythm";
+import {
+  bonusForGrade,
+  DEFAULT_GRADING_FRAMES,
+  gradeAction,
+} from "./rhythm-grading";
 import type { GameState, InputBits } from "./types";
 
 function modChannel(n: number): UnstableChannel {
@@ -112,6 +126,16 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   }
 
   s.runElapsedMs = (s.runElapsedMs ?? 0) + dtMs;
+  /* World heartbeat advances with sim time (not wall clock) — deterministic
+     and unaffected by hit-stop. Per-action grades are computed below. */
+  s.rhythm = advanceRhythm(s.rhythm, s.runElapsedMs);
+  /* AR-2.2 input grading — Perfect/Good/OK/Off tiers drive bonuses. */
+  const actionGrade = gradeAction(
+    s.rhythm,
+    s.runElapsedMs,
+    DEFAULT_GRADING_FRAMES,
+  );
+  const actionBonus = bonusForGrade(actionGrade);
 
   const ash = { ...s.ash };
   const solids = solidsOf(s.level);
@@ -127,7 +151,11 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   if (ash.fusionPureSenseMs > 0) {
     ash.fusionPureSenseMs = Math.max(0, ash.fusionPureSenseMs - dtMs);
   }
-  /* [E] Read space: real-time timers only — never feeds PERCEPTION_SCALE. */
+  /* Resonance Sight — [E] Read mode. Cooldown'd burst (not toggle, not hold):
+     one edge press opens the reading window; window closes on its own; cooldown
+     begins on close. Real-time only — never scaled by PERCEPTION_SCALE, since
+     canon says the [E] read is Pure faculty without time dilation. Spec:
+     lore-canon/01 Master Canon/Schools/Pure - Resonance Sight.md */
   if (ash.perceptionRemainingMs > 0) {
     ash.perceptionRemainingMs = Math.max(0, ash.perceptionRemainingMs - dtMs);
     if (ash.perceptionRemainingMs <= 0) {
@@ -173,6 +201,9 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   if (ash.dashRemainingMs > 0) {
     ash.dashRemainingMs = Math.max(0, ash.dashRemainingMs - dtMs);
   }
+  if (ash.wallJumpLockoutMs > 0) {
+    ash.wallJumpLockoutMs = Math.max(0, ash.wallJumpLockoutMs - dtMs);
+  }
 
   if (ash.hitbox.active) {
     ash.hitbox.ttl -= dtMs;
@@ -202,6 +233,31 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     ash.perceptionRemainingMs = PERCEPTION_READ_DURATION_MS;
   }
 
+  /* Resonance Sight tutorial: if Ash is approaching the acid wash around x≈850
+     on Folio I and has never pressed [E], surface the canonical name once.
+     Pressing [E] at any point silences it for the rest of the run (even
+     before the trigger fires). Numbers cited are from the Pure - Resonance
+     Sight canon doc (2.6s window / 7.8s cooldown). */
+  if (input.perceptionPressed) s.perceptionEverUsed = true;
+  if (
+    !s.perceptionHintShown &&
+    !s.perceptionEverUsed &&
+    s.level.id === "blackcity_lab_containment" &&
+    ash.x >= 850
+  ) {
+    s.perceptionHintShown = true;
+    s.beat = {
+      id: "perception_tutorial",
+      text: "Resonance Sight — mother's gift. Press E.\nRead the acid before you run it. 2.6s read · 7.8s cooldown.",
+      ttlMs: 3000,
+    };
+  } else if (
+    s.perceptionEverUsed &&
+    s.beat?.id === "perception_tutorial"
+  ) {
+    s.beat = null;
+  }
+
   if (
     input.dashPressed &&
     ash.dashCooldownMs <= 0 &&
@@ -211,6 +267,11 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     ash.dashCooldownMs = DASH_COOLDOWN_MS;
     /* Strong vertical dump: burst reads committed, not a floaty drift. */
     ash.vy *= 0.2;
+    /* Rhythm grade → dash i-frames (AR-2.2). Off-beat grants zero — dash
+       still works, just without the invuln. */
+    if (actionBonus.dashIframeMs > 0) {
+      ash.invulnMs = Math.max(ash.invulnMs, actionBonus.dashIframeMs);
+    }
   }
 
   const dashing = ash.dashRemainingMs > 0;
@@ -264,13 +325,56 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
       if (Math.abs(ash.vx) < 8) ash.vx = 0;
     }
 
+    /* Wall contact detection — airborne only; suppressed briefly after wall jump
+       so a kick-off doesn't immediately re-stick. Pure fusion shortens that lockout. */
+    let wallSide: -1 | 0 | 1 = 0;
+    if (!ash.grounded) {
+      const effectiveLockout =
+        fStyle === "pure"
+          ? ash.wallJumpLockoutMs * PURE_WALL_LOCKOUT_FORGIVENESS
+          : ash.wallJumpLockoutMs;
+      if (effectiveLockout <= 0) {
+        wallSide = detectWallSide(ash, solids, WALL_CONTACT_PROBE_PX);
+      }
+    }
+    ash.wallContactSide = wallSide;
+
+    /* Wall slide: airborne + horizontal input into the wall + falling. */
+    const pressingIntoWall =
+      (wallSide === 1 && input.right) || (wallSide === -1 && input.left);
+    const wallSliding = !ash.grounded && pressingIntoWall && ash.vy > 0;
+    ash.wallSlideActive = wallSliding;
+
     ash.vy = Math.min(vCap, ash.vy + (grav * dt) / 1000);
+    if (wallSliding && ash.vy > WALL_SLIDE_FALL_CAP) {
+      ash.vy = WALL_SLIDE_FALL_CAP;
+    }
 
     if (ash.jumpBufferMs > 0 && ash.coyoteMs > 0) {
-      ash.vy = JUMP_VELOCITY;
+      /* Rhythm grade scales jump height: Perfect=1.5, Good=1.25, OK=1.1,
+         Off=1.0 (baseline). vy is negative, so multiplier makes jump higher. */
+      ash.vy = JUMP_VELOCITY * actionBonus.jumpVyMult;
       ash.jumpBufferMs = 0;
       ash.coyoteMs = 0;
       ash.grounded = false;
+    } else if (ash.jumpBufferMs > 0 && wallSide !== 0 && !ash.grounded) {
+      /* Wall jump: kick opposite the contact side. Soft vy relative to floor jump.
+         Lockout prevents immediate re-grab of the same wall. */
+      const wallJumpVy = JUMP_VELOCITY * WALL_JUMP_VY_FACTOR;
+      ash.vy = wallJumpVy * actionBonus.jumpVyMult;
+      ash.vx = -wallSide * WALL_JUMP_POP_SPEED;
+      ash.facing = (-wallSide > 0 ? 1 : -1) as 1 | -1;
+      ash.jumpBufferMs = 0;
+      ash.wallJumpLockoutMs = WALL_JUMP_LOCKOUT_MS;
+      ash.wallContactSide = 0;
+      ash.wallSlideActive = false;
+    }
+
+    /* Variable jump height: releasing jump while still rising trims the arc.
+       Classic short-hop / full-hop split. */
+    if (!input.jump && ash.vy < 0 && !ash.grounded) {
+      const trimmed = JUMP_VELOCITY * VARIABLE_JUMP_RELEASE_FACTOR;
+      if (ash.vy < trimmed) ash.vy = trimmed;
     }
   }
 
@@ -285,6 +389,10 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
   ash.y = ry.y;
   ash.grounded = ry.grounded;
   if (ash.grounded && ash.vy > 0) ash.vy = 0;
+  if (ash.grounded) {
+    ash.wallContactSide = 0;
+    ash.wallSlideActive = false;
+  }
 
   /* Landing from a real fall: trim horizontal carry so stepped geometry and
      platform lips read as stable landings, not sideways skates. */
@@ -503,6 +611,9 @@ export function stepGame(state: GameState, input: InputBits, dtMs: number): Game
     ash.perceptionRemainingMs = 0;
     ash.perceptionCooldownRemainingMs = 0;
     ash.perceptionActive = false;
+    ash.wallContactSide = 0;
+    ash.wallSlideActive = false;
+    ash.wallJumpLockoutMs = 0;
     ash.invulnMs = INVULN_AFTER_HIT_MS;
     s.beat = {
       id: "down",

@@ -18,7 +18,7 @@ const LEGACY_KEY = "void-wars-folio-progress-v1";
 const STORAGE_KEY = "void-wars-folio-progress-v2";
 
 const DEFAULT: FolioProgress = {
-  unlockedIds: ["blackcity_lab"],
+  unlockedIds: ["blackcity_lab_containment"],
   clearedIds: [],
   clearCountByStage: {},
   bestTimeMsByStage: {},

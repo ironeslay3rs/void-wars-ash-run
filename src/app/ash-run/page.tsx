@@ -16,7 +16,7 @@ import { playSfx } from "@/lib/playSfx";
 
 function defaultProgress(): FolioProgress {
   return {
-    unlockedIds: ["blackcity_lab"],
+    unlockedIds: ["blackcity_lab_containment"],
     clearedIds: [],
     clearCountByStage: {},
     bestTimeMsByStage: {},
@@ -25,7 +25,7 @@ function defaultProgress(): FolioProgress {
 
 export default function AshRunPage() {
   const [view, setView] = useState<"map" | "play">("map");
-  const [levelId, setLevelId] = useState("blackcity_lab");
+  const [levelId, setLevelId] = useState("blackcity_lab_containment");
   const [progress, setProgress] = useState<FolioProgress>(defaultProgress);
   const [mapBanner, setMapBanner] = useState<string | null>(null);
 

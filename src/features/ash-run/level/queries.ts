@@ -5,6 +5,7 @@ import type {
   HazardVolume,
   LevelDef,
   LevelEntity,
+  ResonanceTraceVolume,
   Solid,
 } from "./types";
 import type { PatrolEnemy } from "../entities/types";
@@ -31,6 +32,10 @@ export function isExit(e: LevelEntity): e is ExitVolume {
 
 export function isPatrol(e: LevelEntity): e is PatrolEnemy {
   return e.kind === "patrol";
+}
+
+export function isResonanceTrace(e: LevelEntity): e is ResonanceTraceVolume {
+  return e.kind === "resonance_trace";
 }
 
 export function solidsOf(level: LevelDef): Solid[] {

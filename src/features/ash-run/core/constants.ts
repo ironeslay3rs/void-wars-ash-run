@@ -70,15 +70,41 @@ export const UNSTABLE_FLASH_MS = 220;
 export const BIO_BURST_VX = 420;
 export const BIO_BURST_VY = -180;
 export const MECHA_DASH_MS = 88;
+/* Resonance Sight (Pure school) — canon-locked in
+   `lore-canon/01 Master Canon/Schools/Pure - Resonance Sight.md`.
+   Two modes share one faculty: [E] Read (manual burst) and [K] Pure
+   fusion route-sense (motion-gated slow-mo). No mana cost, cooldown
+   only — deliberate deviation documented in the canon doc. */
 /** Fusion Pure [K]: slow-mo route-sense duration (uses PERCEPTION_SCALE in step-game). */
 export const PERCEPTION_MS = 480;
 export const PERCEPTION_SCALE = 0.42;
-/** [E] Read space — hazard/route clarity only; no slow-mo, no combat buffs. */
+/** [E] Resonance Sight: reading-window length; cooldown'd burst, not a toggle. */
 export const PERCEPTION_READ_DURATION_MS = 2600;
+/** [E] Resonance Sight: full cooldown after the reading window closes. */
 export const PERCEPTION_READ_COOLDOWN_MS = 7800;
 /** Fusion as movement layer: Bio / Mecha windows after [K] (Pure uses perception time). */
 export const FUSION_BIO_MOVE_MS = 540;
 export const FUSION_MECHA_MOVE_MS = 460;
+
+/* -------------------------------------------------------------------------- */
+/* Wall slide / wall jump / variable jump                                     */
+/* -------------------------------------------------------------------------- */
+/* Bio+Mecha heritage: Ash can hug walls briefly and kick off. Pure fusion
+   widens the re-grab forgiveness (see step-game fusionMoveStyle). */
+/** Fall speed cap while wall-sliding — visibly slower than free fall. */
+export const WALL_SLIDE_FALL_CAP = 220;
+/** Horizontal pop off the wall on a wall jump (opposite side of contact). */
+export const WALL_JUMP_POP_SPEED = 300;
+/** Ms after a wall jump during which re-sticking to the same wall is suppressed. */
+export const WALL_JUMP_LOCKOUT_MS = 180;
+/** Horizontal probe distance used when detecting a wall the body is pressed into. */
+export const WALL_CONTACT_PROBE_PX = 1.2;
+/** Variable jump trim: on jump release while vy<0, vy := max(vy, JUMP_VELOCITY * this). */
+export const VARIABLE_JUMP_RELEASE_FACTOR = 0.45;
+/** Wall jump vertical impulse = JUMP_VELOCITY * this (slightly softer than a full floor jump). */
+export const WALL_JUMP_VY_FACTOR = 0.95;
+/** Pure fusion widens wall-slide re-grab forgiveness (lockout shortened by this factor). */
+export const PURE_WALL_LOCKOUT_FORGIVENESS = 0.7;
 
 export const ASH_WIDTH = 22;
 export const ASH_HEIGHT = 36;

@@ -34,7 +34,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of blackcity_lab unlocks training_yard", () => {
-    const r = applyStageWin("blackcity_lab", ["blackcity_lab", "training_yard"], {
+    const r = applyStageWin("blackcity_lab_containment", ["blackcity_lab_containment", "training_yard"], {
       timeMs: 120_000,
     });
     expect(r.newlyUnlocked).toContain("training_yard");
@@ -44,18 +44,18 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("repeat clear does not unlock again but bumps count", () => {
-    applyStageWin("blackcity_lab", ["blackcity_lab", "training_yard"]);
-    const r = applyStageWin("blackcity_lab", ["blackcity_lab", "training_yard"], {
+    applyStageWin("blackcity_lab_containment", ["blackcity_lab_containment", "training_yard"]);
+    const r = applyStageWin("blackcity_lab_containment", ["blackcity_lab_containment", "training_yard"], {
       timeMs: 90_000,
     });
     expect(r.newlyUnlocked).toEqual([]);
     expect(r.wasFirstClear).toBe(false);
-    expect(r.progress.clearCountByStage["blackcity_lab"]).toBeGreaterThanOrEqual(2);
+    expect(r.progress.clearCountByStage["blackcity_lab_containment"]).toBeGreaterThanOrEqual(2);
     expect(r.isNewRecord).toBe(true);
   });
 
   it("persists to localStorage", () => {
-    applyStageWin("blackcity_lab", ["blackcity_lab", "training_yard"]);
+    applyStageWin("blackcity_lab_containment", ["blackcity_lab_containment", "training_yard"]);
     const loaded = loadFolioProgress();
     expect(loaded.unlockedIds).toContain("training_yard");
     expect(
@@ -66,14 +66,14 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of training_yard unlocks folio_iii_vault in full chain", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     const r = applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     expect(r.newlyUnlocked).toContain("folio_iii_vault");
     expect(r.progress.unlockedIds).toContain("folio_iii_vault");
   });
 
   it("first clear of folio_iii_vault unlocks folio_iv_fracture", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     const r = applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     expect(r.newlyUnlocked).toContain("folio_iv_fracture");
@@ -82,10 +82,10 @@ describe("folioProgress (browser shim)", () => {
 
   it("load repairs unlock when vault was cleared before Folio IV shipped", () => {
     const partial = {
-      unlockedIds: ["blackcity_lab", "training_yard", "folio_iii_vault"],
-      clearedIds: ["blackcity_lab", "training_yard", "folio_iii_vault"],
+      unlockedIds: ["blackcity_lab_containment", "training_yard", "folio_iii_vault"],
+      clearedIds: ["blackcity_lab_containment", "training_yard", "folio_iii_vault"],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
       },
@@ -100,7 +100,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_iv_fracture unlocks folio_v_reckoning", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     const r = applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -110,10 +110,10 @@ describe("folioProgress (browser shim)", () => {
 
   it("load repairs unlock when fracture was cleared before Folio V shipped", () => {
     const partial = {
-      unlockedIds: ["blackcity_lab", "training_yard", "folio_iii_vault", "folio_iv_fracture"],
-      clearedIds: ["blackcity_lab", "training_yard", "folio_iii_vault", "folio_iv_fracture"],
+      unlockedIds: ["blackcity_lab_containment", "training_yard", "folio_iii_vault", "folio_iv_fracture"],
+      clearedIds: ["blackcity_lab_containment", "training_yard", "folio_iii_vault", "folio_iv_fracture"],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -129,7 +129,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_v_reckoning unlocks folio_vi_closure", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -141,21 +141,21 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio V was cleared before VI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
         "folio_v_reckoning",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
         "folio_v_reckoning",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -172,7 +172,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_vi_closure unlocks folio_vii_exile", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -185,7 +185,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio VI was cleared before VII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -193,7 +193,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_vi_closure",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -201,7 +201,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_vi_closure",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -219,7 +219,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_vii_exile unlocks folio_viii_horizon", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -233,7 +233,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio VII was cleared before VIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -242,7 +242,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_vii_exile",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -251,7 +251,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_vii_exile",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -270,7 +270,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_viii_horizon unlocks folio_ix_echo", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -285,7 +285,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio VIII was cleared before IX shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -295,7 +295,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_viii_horizon",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -305,7 +305,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_viii_horizon",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -325,7 +325,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_ix_echo unlocks folio_x_verge", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -341,7 +341,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio IX was cleared before X shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -352,7 +352,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_ix_echo",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -363,7 +363,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_ix_echo",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -384,7 +384,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_x_verge unlocks folio_xi_zenith", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -401,7 +401,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio X was cleared before XI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -413,7 +413,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_x_verge",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -425,7 +425,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_x_verge",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -447,7 +447,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xi_zenith unlocks folio_xii_terminus", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -465,7 +465,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XI was cleared before XII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -478,7 +478,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xi_zenith",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -491,7 +491,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xi_zenith",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -514,7 +514,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xii_terminus unlocks folio_xiii_coda", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -533,7 +533,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XII was cleared before XIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -547,7 +547,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xii_terminus",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -561,7 +561,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xii_terminus",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -585,7 +585,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xiii_coda unlocks folio_xiv_afterword", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -605,7 +605,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XIII was cleared before XIV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -620,7 +620,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xiii_coda",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -635,7 +635,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xiii_coda",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -660,7 +660,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xiv_afterword unlocks folio_xv_postscript", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -681,7 +681,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XIV was cleared before XV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -697,7 +697,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xiv_afterword",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -713,7 +713,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xiv_afterword",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -739,7 +739,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xv_postscript unlocks folio_xvi_index", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -761,7 +761,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XV was cleared before XVI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -778,7 +778,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xv_postscript",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -795,7 +795,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xv_postscript",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -822,7 +822,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xvi_index unlocks folio_xvii_appendix", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -845,7 +845,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XVI was cleared before XVII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -863,7 +863,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xvi_index",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -881,7 +881,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xvi_index",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -909,7 +909,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xvii_appendix unlocks folio_xviii_colophon", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -933,7 +933,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XVII was cleared before XVIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -952,7 +952,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xvii_appendix",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -971,7 +971,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xvii_appendix",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1000,7 +1000,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xviii_colophon unlocks folio_xix_epilogue", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1025,7 +1025,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XVIII was cleared before XIX shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1045,7 +1045,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xviii_colophon",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1065,7 +1065,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xviii_colophon",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1095,7 +1095,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xix_epilogue unlocks folio_xx_codex", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1121,7 +1121,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XIX was cleared before XX shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1142,7 +1142,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xix_epilogue",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1163,7 +1163,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xix_epilogue",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1194,7 +1194,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xx_codex unlocks folio_xxi_afterline", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1221,7 +1221,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XX was cleared before XXI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1243,7 +1243,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xx_codex",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1265,7 +1265,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xx_codex",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1297,7 +1297,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxi_afterline unlocks folio_xxii_vellum", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1325,7 +1325,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXI was cleared before XXII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1348,7 +1348,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxi_afterline",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1371,7 +1371,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxi_afterline",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1404,7 +1404,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxii_vellum unlocks folio_xxiii_endpaper", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1433,7 +1433,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXII was cleared before XXIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1457,7 +1457,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxii_vellum",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1481,7 +1481,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxii_vellum",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1515,7 +1515,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxiii_endpaper unlocks folio_xxiv_flyleaf", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1545,7 +1545,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXIII was cleared before XXIV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1570,7 +1570,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxiii_endpaper",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1595,7 +1595,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxiii_endpaper",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1630,7 +1630,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxiv_flyleaf unlocks folio_xxv_halftitle", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1661,7 +1661,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXIV was cleared before XXV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1687,7 +1687,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxiv_flyleaf",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1713,7 +1713,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxiv_flyleaf",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1749,7 +1749,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxv_halftitle unlocks folio_xxvi_frontispiece", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1781,7 +1781,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXV was cleared before XXVI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1808,7 +1808,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxv_halftitle",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1835,7 +1835,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxv_halftitle",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1872,7 +1872,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxvi_frontispiece unlocks folio_xxvii_titlepage", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -1905,7 +1905,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXVI was cleared before XXVII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1933,7 +1933,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxvi_frontispiece",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -1961,7 +1961,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxvi_frontispiece",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -1999,7 +1999,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxvii_titlepage unlocks folio_xxviii_copyright", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2033,7 +2033,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXVII was cleared before XXVIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2062,7 +2062,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxvii_titlepage",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2091,7 +2091,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxvii_titlepage",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -2130,7 +2130,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxviii_copyright unlocks folio_xxix_dedication", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2165,7 +2165,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXVIII was cleared before XXIX shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2195,7 +2195,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxviii_copyright",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2225,7 +2225,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxviii_copyright",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -2265,7 +2265,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxix_dedication unlocks folio_xxx_epigraph", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2301,7 +2301,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXIX was cleared before XXX shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2332,7 +2332,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxix_dedication",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2363,7 +2363,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxix_dedication",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -2404,7 +2404,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxx_epigraph unlocks folio_xxxi_foreword", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2439,7 +2439,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxi_foreword unlocks folio_xxxii_preface", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2475,7 +2475,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxii_preface unlocks folio_xxxiii_introduction", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2512,7 +2512,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxiii_introduction unlocks folio_xxxiv_body", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2550,7 +2550,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxiv_body unlocks folio_xxxv_incipit", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2589,7 +2589,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxv_incipit unlocks folio_xxxvi_chapter", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2629,7 +2629,7 @@ describe("folioProgress (browser shim)", () => {
   });
 
   it("first clear of folio_xxxvi_chapter unlocks folio_xxxvii_interlude", () => {
-    applyStageWin("blackcity_lab", FOLIO_STAGE_ORDER);
+    applyStageWin("blackcity_lab_containment", FOLIO_STAGE_ORDER);
     applyStageWin("training_yard", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iii_vault", FOLIO_STAGE_ORDER);
     applyStageWin("folio_iv_fracture", FOLIO_STAGE_ORDER);
@@ -2672,7 +2672,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXX was cleared before XXXI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2704,7 +2704,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxx_epigraph",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2736,7 +2736,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxx_epigraph",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -2780,7 +2780,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXI was cleared before XXXII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2813,7 +2813,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxi_foreword",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2846,7 +2846,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxi_foreword",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -2891,7 +2891,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXII was cleared before XXXIII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2925,7 +2925,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxii_preface",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -2959,7 +2959,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxii_preface",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -3005,7 +3005,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXIII was cleared before XXXIV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3040,7 +3040,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxiii_introduction",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3075,7 +3075,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxiii_introduction",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -3122,7 +3122,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXIV was cleared before XXXV shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3158,7 +3158,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxiv_body",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3194,7 +3194,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxiv_body",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -3242,7 +3242,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXV was cleared before XXXVI shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3279,7 +3279,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxv_incipit",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3316,7 +3316,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxv_incipit",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,
@@ -3365,7 +3365,7 @@ describe("folioProgress (browser shim)", () => {
   it("load repairs unlock when Folio XXXVI was cleared before XXXVII shipped", () => {
     const partial = {
       unlockedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3403,7 +3403,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxvi_chapter",
       ],
       clearedIds: [
-        "blackcity_lab",
+        "blackcity_lab_containment",
         "training_yard",
         "folio_iii_vault",
         "folio_iv_fracture",
@@ -3441,7 +3441,7 @@ describe("folioProgress (browser shim)", () => {
         "folio_xxxvi_chapter",
       ],
       clearCountByStage: {
-        blackcity_lab: 1,
+        blackcity_lab_containment: 1,
         training_yard: 1,
         folio_iii_vault: 1,
         folio_iv_fracture: 1,

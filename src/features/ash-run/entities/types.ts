@@ -49,6 +49,12 @@ export type Ash = {
   perceptionCooldownRemainingMs: number;
   /** True while `perceptionRemainingMs > 0` (set each step in step-game). */
   perceptionActive: boolean;
+  /** -1 left wall, 1 right wall, 0 airborne/no wall contact. */
+  wallContactSide: -1 | 0 | 1;
+  /** True while wall-slide fall cap is applied this step. */
+  wallSlideActive: boolean;
+  /** Ms remaining that re-stick to the same wall is suppressed after a wall jump. */
+  wallJumpLockoutMs: number;
   width: number;
   height: number;
 };
