@@ -97,6 +97,11 @@ export type FolioStageMeta = {
   roadmapOnly?: boolean;
 };
 
+export type FolioCanonFocus = {
+  label: string;
+  note: string;
+};
+
 /** Map card subtitle line (time + band). */
 export function folioMetaSummary(meta: FolioStageMeta): string | null {
   const bits: string[] = [];
@@ -382,6 +387,50 @@ export const FOLIO_STAGES: readonly FolioStageMeta[] = [
 export function folioMapLabel(stageId: string): string {
   const m = FOLIO_STAGES.find((s) => s.id === stageId);
   return m?.mapLabel ?? stageId;
+}
+
+/**
+ * Map-facing canon anchors inferred from the local vault's Black Market, Void,
+ * and Three Schools notes so the board feels tied to Oblivion without inventing
+ * a separate full lore sheet for every folio.
+ */
+export function folioCanonFocus(stageId: string): FolioCanonFocus {
+  const meta = FOLIO_STAGES.find((s) => s.id === stageId);
+  if (meta?.roadmapOnly) {
+    return {
+      label: "Roadmap signal",
+      note:
+        "This folio keeps the route visible on the board, but the next playable Oblivion slice has not shipped yet.",
+    };
+  }
+
+  const idx = FOLIO_STAGE_ORDER.indexOf(stageId as FolioPlayableId);
+  if (idx <= 1) {
+    return {
+      label: "Blackcity breach",
+      note:
+        "Ash starts where the Black Market fuses strains — not pure Bio, Mecha, or Pure, but a little of everything. The opening board favors clean routing over exposition.",
+    };
+  }
+  if (idx <= 11) {
+    return {
+      label: "Void pressure",
+      note:
+        "The Void reads as exile and forced adaptation: treat the route like a law you learn once, then stop second-guessing under pressure.",
+    };
+  }
+  if (idx <= 23) {
+    return {
+      label: "Mixed evolution",
+      note:
+        "Mid-folios lean into the Market’s identity: trade, corruption, and adaptation intersect — Bio, Mecha, and Pure survival lines braided on one lane.",
+    };
+  }
+  return {
+    label: "Oblivion margin",
+    note:
+      "Late folios stress memory, law, and endurance — closer to the saga’s wider Oblivion tone across the seven-book spine.",
+  };
 }
 
 /** Why a node is locked, for helper copy under the card. */
@@ -707,6 +756,12 @@ export function introBeatForLevel(id: string): {
         id: "intro_interlude",
         text: "Interlude — ten drones, bleed trim then signature stitch.\nChapter turned the leaf; this breath trims the edge, threads the midline, gathers the fold before the intervenor.",
         ttlMs: 10200,
+      };
+    case "folio_xxxviii_postlude":
+      return {
+        id: "intro_postlude",
+        text: "Postlude - the next folio is still forming.\nThe board keeps the route visible now; the run lands when the stage is ready under hand.",
+        ttlMs: 4200,
       };
     default:
       return {

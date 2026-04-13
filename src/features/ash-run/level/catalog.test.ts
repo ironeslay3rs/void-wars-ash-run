@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { folioLockHint, FOLIO_STAGE_ORDER, FOLIO_STAGES } from "./catalog";
+import {
+  folioCanonFocus,
+  folioLockHint,
+  FOLIO_STAGE_ORDER,
+  FOLIO_STAGES,
+} from "./catalog";
 
 describe("catalog", () => {
   it("Folio V is playable in unlock order", () => {
@@ -369,5 +374,21 @@ describe("catalog", () => {
   it("folioLockHint for Folio XXXVIII teaser mentions latest clearable folio", () => {
     const h = folioLockHint("folio_xxxviii_postlude", { unlockedIds: [] });
     expect(h).toContain("Folio XXXVII");
+  });
+
+  it("canon focus frames the opening around Blackcity", () => {
+    expect(folioCanonFocus("blackcity_lab").label).toBe("Blackcity breach");
+  });
+
+  it("canon focus frames mid-folios around mixed evolution", () => {
+    expect(folioCanonFocus("folio_xv_postscript").label).toBe("Mixed evolution");
+  });
+
+  it("canon focus frames late folios around Oblivion pressure", () => {
+    expect(folioCanonFocus("folio_xxxvi_chapter").label).toBe("Oblivion margin");
+  });
+
+  it("canon focus marks the teaser folio as roadmap-only", () => {
+    expect(folioCanonFocus("folio_xxxviii_postlude").label).toBe("Roadmap signal");
   });
 });

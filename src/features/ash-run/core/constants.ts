@@ -10,16 +10,16 @@ export const FIXED_DT_MS = 1000 / 60;
 export const GRAVITY = 2380;
 export const MAX_FALL_SPEED = 760;
 
-/* Split accel: ground is deliberate (slower ramp = easier to place feet);
-   air is weaker so hops commit a bit but A/D still steers clearly. */
-export const MOVE_ACCEL_GROUND = 3000;
-export const MOVE_ACCEL_AIR = 2350;
-export const MOVE_MAX = 300;
+/* Slightly stronger horizontal snap for a more confident run: Ash reaches pace
+   sooner on ground and keeps enough air steering to stay readable. */
+export const MOVE_ACCEL_GROUND = 3360;
+export const MOVE_ACCEL_AIR = 2480;
+export const MOVE_MAX = 318;
 
-/* Ground friction nudged up: less micro-slide on narrow step tops after
-   landings; air unchanged. */
-export const FRICTION_GROUND = 0.86;
-export const FRICTION_AIR = 0.94;
+/* Firmer stop on ground, tiny bit more carry in air: closer to a classic
+   action-platformer run without pushing authored jumps off-spec. */
+export const FRICTION_GROUND = 0.82;
+export const FRICTION_AIR = 0.95;
 
 /* Jump impulse up slightly — leaves the ground faster (snappier takeoff). */
 export const JUMP_VELOCITY = -545;

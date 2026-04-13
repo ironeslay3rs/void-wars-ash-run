@@ -5,6 +5,14 @@ on:
     branches: [master, main]
   pull_request:
     branches: [master, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   check:
@@ -16,6 +24,50 @@ jobs:
           node-version: "20"
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+      - run: npm run check
+
+  # Runs only when VERCEL_* secrets are set (see docs/VERCEL_GITHUB.md).
+  # Skip if you rely 100% on Vercel’s GitHub App alone — avoid duplicate production deploys.
+  vercel:
+    name: Deploy to Vercel
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    if: |
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      secrets.VERCEL_TOKEN != '' &&
+      secrets.VERCEL_ORG_ID != '' &&
+      secrets.VERCEL_PROJECT_ID != ''
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Set deploy target
+        id: target
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "pull_env=preview" >> "$GITHUB_OUTPUT"
+            echo "prod_args=" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "pull_env=production" >> "$GITHUB_OUTPUT"
+            echo "prod_args=--prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "pull_env=preview" >> "$GITHUB_OUTPUT"
+            echo "prod_args=" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
+      - name: Pull Vercel env
+        run: vercel pull --yes --environment=${{ steps.target.outputs.pull_env }}
+      - name: Build
+        run: vercel build ${{ steps.target.outputs.prod_args }}
+      - name: Deploy
+        run: vercel deploy --prebuilt ${{ steps.target.outputs.prod_args }}

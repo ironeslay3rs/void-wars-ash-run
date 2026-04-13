@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hubTagline } from "@/lib/canon-lore";
 
 export default function StudioHubPage() {
   return (
@@ -12,6 +13,9 @@ export default function StudioHubPage() {
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-sm text-zinc-400">
           Two prototypes in one repo — pick a mode. Saves stay in your browser.
+        </p>
+        <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-zinc-500">
+          {hubTagline}
         </p>
       </div>
 

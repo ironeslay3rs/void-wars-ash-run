@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AshRunScene } from "@/components/ash-run/AshRunScene";
 import { WorldMap } from "@/components/world-map/WorldMap";
 import {
@@ -12,7 +13,6 @@ import {
   type FolioProgress,
 } from "@/lib/folioProgress";
 import { playSfx } from "@/lib/playSfx";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
 function defaultProgress(): FolioProgress {
   return {
@@ -46,7 +46,7 @@ export default function AshRunPage() {
       if (newlyUnlocked.length > 0) {
         playSfx("folio_unlock");
         const names = newlyUnlocked.map((nid) => folioMapLabel(nid));
-        setMapBanner(`New folio: ${names.join(" · ")}`);
+        setMapBanner(`New folio unlocked: ${names.join(" / ")}`);
       }
       if (isNewRecord) {
         playSfx("personal_best");

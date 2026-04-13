@@ -1,3 +1,13 @@
+# black-market-survivor
+
+**Evolution: Void Wars** — local-first **Game Studio** hub with **Black Market Survivor** (`/survivor`) and **Void Wars: Ash Run** (`/ash-run`).
+
+- **Workflow:** `npm run check` (lint, tests, build) — see [`docs/WORKFLOW.md`](docs/WORKFLOW.md).
+- **Memory & next plan:** [`docs/PROJECT_MEMORY.md`](docs/PROJECT_MEMORY.md) ([`project-memory.md`](docs/project-memory.md)) — **Living state**, **Fence**, work log, queue, **inputs**; update **after each batch** (see `AGENTS.md`, `gsd-autonomous` rule).
+- **Deploy:** Vercel + GitHub — import the repo in Vercel for preview/production builds; see [`docs/VERCEL_GITHUB.md`](docs/VERCEL_GITHUB.md).
+- **Assistants & credentials** (MCP, CLI, CI): [`docs/ASSISTANT_INTEGRATIONS.md`](docs/ASSISTANT_INTEGRATIONS.md).
+- **Lore & books:** [`lore-canon/`](lore-canon/) (master canon, seven-book saga, per-game locked rules). Player-facing taglines: [`src/lib/canon-lore.ts`](src/lib/canon-lore.ts).
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

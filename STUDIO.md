@@ -4,7 +4,9 @@
 
 ## Vault (canon & locked rules)
 
-`C:\Users\irone\Evolution Void Wars Vault -for game studio\Evolution Void Wars Vault\03 Games\Void Wars Ash Run\`
+**In this repo:** `lore-canon/` (full IP vault: books, master canon, games). Ash Run: `lore-canon/03 Games/Void Wars Ash Run/Locked Rules/Core Rules.md`. See also `lore-canon/GAME_BRIDGE.md`.
+
+**External mirror (if used):** `C:\Users\irone\Evolution Void Wars Vault -for game studio\Evolution Void Wars Vault\03 Games\Void Wars Ash Run\`
 
 - Core rules: `Locked Rules/Core Rules.md`
 - Obsidian lane: `00 - Game Studio Lane.md` (if present)

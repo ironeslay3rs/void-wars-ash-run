@@ -1,0 +1,23 @@
+---
+description: GSD autonomous loop — ends each batch by updating project memory (living state + fence)
+alwaysApply: true
+---
+
+# GSD autonomous (agents)
+
+Follow this loop for substantive, multi-step work.
+
+1. **Goal** — State the outcome in one sentence; if unclear, ask one tight clarifying question.
+2. **Ground** — Read **`docs/PROJECT_MEMORY.md`** (Snapshot, **Living state**, **Fence**, Next implementation plan, queue, work log, Inputs & decisions).
+3. **Scan** — Touch only files and systems the goal requires; prefer existing patterns (`docs/WORKFLOW.md`, `AGENTS.md`).
+4. **Execute** — Implement, test locally with **`npm run check`** before claiming done.
+5. **Verify** — Lint + tests + production build green (or document why skipped).
+6. **Ship discipline** — Small diffs; no scope creep past the **Fence** unless the user expands it.
+7. **After a batch** — **Update `docs/PROJECT_MEMORY.md`** (canonical; see also `docs/project-memory.md` alias):
+   - **Living state** — current focus, branch/PR, blockers.
+   - **Fence** — what this batch included / explicitly excluded.
+   - **Work log** — newest entry on top (date + bullets).
+   - **Last refreshed** date.
+   - Adjust **Next implementation plan**, **Current implementation queue**, **Snapshot**, and **Inputs & decisions** if anything changed.
+
+Memory = **what happened + what we decided (inputs) + what’s next**. Keep it honest so the next agent or session can resume without re-discovery.

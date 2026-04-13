@@ -7,6 +7,7 @@ import { PrimaryActions } from "@/components/game/PrimaryActions";
 import { RunResetRow } from "@/components/game/RunResetRow";
 import { ShopAndUpgrades } from "@/components/game/ShopAndUpgrades";
 import { useEffect } from "react";
+import { survivorFlavorLine } from "@/lib/canon-lore";
 import { useGameEngine } from "./useGameEngine";
 
 export function GameScreen() {
@@ -74,6 +75,7 @@ export function GameScreen() {
         <p className="mt-1 text-sm text-zinc-400">
           One screen, local save — manage health, hunger, stress, credits, and scrap.
         </p>
+        <p className="mt-2 text-xs leading-relaxed text-zinc-500">{survivorFlavorLine}</p>
       </header>
 
       <GameStatsBar state={state} />

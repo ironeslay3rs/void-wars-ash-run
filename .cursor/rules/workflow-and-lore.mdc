@@ -1,0 +1,20 @@
+---
+description: Repo workflow and Evolution Void Wars lore vault usage
+alwaysApply: true
+---
+
+# Workflow
+
+- **Start substantive tasks** by reading **`docs/PROJECT_MEMORY.md`** (snapshot, **Living state**, **Fence**, next plan, queue, work log, inputs). **After each batch**, update it per **`.cursor/rules/gsd-autonomous.mdc`** Step 7 and **`docs/project-memory.md`** alias → same canonical file.
+- Before claiming work complete, run **`npm run check`** (lint, tests, production build). **GitHub Actions** (`.github/workflows/ci.yml`) runs the same on push/PR to `main`/`master`.
+- **Vercel + GitHub:** see **`docs/VERCEL_GITHUB.md`**. Path A: Vercel GitHub App only (no repo secrets). Path B: optional **`vercel` job** in `.github/workflows/ci.yml` after green `check` — set **`VERCEL_TOKEN`**, **`VERCEL_ORG_ID`**, **`VERCEL_PROJECT_ID`** per **`.github/DEPLOY_SECRETS.md`**; avoid duplicate deploys with Path A.
+- After a vertical slice ships, update **`docs/PROJECT_MEMORY.md`** (Recently shipped, Implementation queue, Last refreshed).
+- Follow **`docs/WORKFLOW.md`** for folio slices and daily loop.
+
+# Lore vault (`lore-canon/`)
+
+- **Master canon** (Void, schools, empires, locations) lives under `lore-canon/01 Master Canon/`.
+- **Books** (seven main volumes + workflow) live under `lore-canon/02 Books/`.
+- **This game (Ash Run)** locked rules: `lore-canon/03 Games/Void Wars Ash Run/Locked Rules/Core Rules.md`.
+- **Media separation:** shared truth is Master Canon; game-specific execution stays in code and game folders — see `lore-canon/99 Core Rules/03 - Media Separation Rules.md`.
+- **Do not** paste book manuscript prose into source files. Use short paraphrases; UI strings live in **`src/lib/canon-lore.ts`** or mode-specific copy.
